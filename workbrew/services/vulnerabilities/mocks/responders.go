@@ -1,7 +1,6 @@
 package mocks
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -9,37 +8,38 @@ import (
 	"github.com/jarcoal/httpmock"
 )
 
-// VulnerabilitiesMock handles mock HTTP responses for vulnerabilities
-type VulnerabilitiesMock struct{}
+func init() {
+	httpmock.RegisterNoResponder(httpmock.NewStringResponder(404, `{"message":"Not Found","errors":["Resource not found"]}`))
+}
 
-// loadMockResponse loads a mock response file from the mocks directory
+// loadMockResponse loads a mock response file
 func loadMockResponse(filename string) ([]byte, error) {
 	mockPath := filepath.Join("mocks", filename)
-	data, err := os.ReadFile(mockPath)
-	if err != nil {
-		absPath, _ := filepath.Abs(mockPath)
-		return nil, fmt.Errorf("failed to load mock file %s (tried: %s, %s): %w", filename, mockPath, absPath, err)
-	}
-	return data, nil
+	return os.ReadFile(mockPath)
 }
+
+// VulnerabilitiesMock handles mock HTTP responses for vulnerabilities
+type VulnerabilitiesMock struct{}
 
 // RegisterMocks registers all success mock responses
 func (m *VulnerabilitiesMock) RegisterMocks(baseURL string) {
 	// Mock GET /vulnerabilities.json
 	httpmock.RegisterResponder("GET", baseURL+"/vulnerabilities.json",
 		func(req *http.Request) (*http.Response, error) {
-			mockData, err := loadMockResponse("vulnerabilities_list.json")
+			mockData, err := loadMockResponse("validate_get_vulnerabilities.json")
 			if err != nil {
 				return httpmock.NewStringResponse(500, `{"message":"Internal Server Error","errors":["Failed to load mock data"]}`), nil
 			}
-			return httpmock.NewBytesResponse(200, mockData), nil
+			resp := httpmock.NewBytesResponse(200, mockData)
+			resp.Header.Set("Content-Type", "application/json")
+			return resp, nil
 		},
 	)
 
 	// Mock GET /vulnerabilities.csv
 	httpmock.RegisterResponder("GET", baseURL+"/vulnerabilities.csv",
 		func(req *http.Request) (*http.Response, error) {
-			mockData, err := loadMockResponse("vulnerabilities_list.csv")
+			mockData, err := loadMockResponse("validate_get_vulnerabilities.csv")
 			if err != nil {
 				return httpmock.NewStringResponse(500, `{"message":"Internal Server Error","errors":["Failed to load mock data"]}`), nil
 			}
@@ -59,7 +59,9 @@ func (m *VulnerabilitiesMock) RegisterErrorMocks(baseURL string) {
 			if err != nil {
 				return httpmock.NewStringResponse(401, `{"message":"Unauthorized","errors":["Invalid API key"]}`), nil
 			}
-			return httpmock.NewBytesResponse(401, mockData), nil
+			resp := httpmock.NewBytesResponse(401, mockData)
+			resp.Header.Set("Content-Type", "application/json")
+			return resp, nil
 		},
 	)
 
@@ -70,7 +72,9 @@ func (m *VulnerabilitiesMock) RegisterErrorMocks(baseURL string) {
 			if err != nil {
 				return httpmock.NewStringResponse(401, `{"message":"Unauthorized","errors":["Invalid API key"]}`), nil
 			}
-			return httpmock.NewBytesResponse(401, mockData), nil
+			resp := httpmock.NewBytesResponse(401, mockData)
+			resp.Header.Set("Content-Type", "application/json")
+			return resp, nil
 		},
 	)
 }
@@ -83,7 +87,9 @@ func (m *VulnerabilitiesMock) RegisterForbiddenMocks(baseURL string) {
 			if err != nil {
 				return httpmock.NewStringResponse(403, `{"message":"Forbidden","errors":["Free tier"]}`), nil
 			}
-			return httpmock.NewBytesResponse(403, mockData), nil
+			resp := httpmock.NewBytesResponse(403, mockData)
+			resp.Header.Set("Content-Type", "application/json")
+			return resp, nil
 		},
 	)
 }
