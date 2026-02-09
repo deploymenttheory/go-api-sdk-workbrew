@@ -1,75 +1,295 @@
-# Template
+# Workbrew Go SDK
 
-This repository serves as a **Default Template Repository** according official [GitHub Contributing Guidelines][ProjectSetup] for healthy contributions. It brings you clean default Templates for several areas:
+Official Go SDK for the [Workbrew API](https://console.workbrew.com/api-docs) v0.
 
-- [Azure DevOps Pull Requests](.azuredevops/PULL_REQUEST_TEMPLATE.md) ([`.azuredevops\PULL_REQUEST_TEMPLATE.md`](`.azuredevops\PULL_REQUEST_TEMPLATE.md`))
-- [Azure Pipelines](.pipelines/pipeline.yml) ([`.pipelines/pipeline.yml`](`.pipelines/pipeline.yml`))
-- [GitHub Workflows](.github/workflows/)
-  - [Super Linter](.github/workflows/linter.yml) ([`.github/workflows/linter.yml`](`.github/workflows/linter.yml`))
-  - [Sample Workflows](.github/workflows/workflow.yml) ([`.github/workflows/workflow.yml`](`.github/workflows/workflow.yml`))
-- [GitHub Pull Requests](.github/PULL_REQUEST_TEMPLATE.md) ([`.github/PULL_REQUEST_TEMPLATE.md`](`.github/PULL_REQUEST_TEMPLATE.md`))
-- [GitHub Issues](.github/ISSUE_TEMPLATE/)
-  - [Feature Requests](.github/ISSUE_TEMPLATE/FEATURE_REQUEST.md) ([`.github/ISSUE_TEMPLATE/FEATURE_REQUEST.md`](`.github/ISSUE_TEMPLATE/FEATURE_REQUEST.md`))
-  - [Bug Reports](.github/ISSUE_TEMPLATE/BUG_REPORT.md) ([`.github/ISSUE_TEMPLATE/BUG_REPORT.md`](`.github/ISSUE_TEMPLATE/BUG_REPORT.md`))
-- [Codeowners](.github/CODEOWNERS) ([`.github/CODEOWNERS`](`.github/CODEOWNERS`)) _adjust usernames once cloned_
-- [Wiki and Documentation](docs/) ([`docs/`](`docs/`))
-- [gitignore](.gitignore) ([`.gitignore`](.gitignore))
-- [gitattributes](.gitattributes) ([`.gitattributes`](.gitattributes))
-- [Changelog](CHANGELOG.md) ([`CHANGELOG.md`](`CHANGELOG.md`))
-- [Code of Conduct](CODE_OF_CONDUCT.md) ([`CODE_OF_CONDUCT.md`](`CODE_OF_CONDUCT.md`))
-- [Contribution](CONTRIBUTING.md) ([`CONTRIBUTING.md`](`CONTRIBUTING.md`))
-- [License](LICENSE) ([`LICENSE`](`LICENSE`)) _adjust projectname once cloned_
-- [Readme](README.md) ([`README.md`](`README.md`))
-- [Security](SECURITY.md) ([`SECURITY.md`](`SECURITY.md`))
+## Features
 
+- **Complete API Coverage**: All 36 endpoints across 13 services
+- **Type-Safe**: Compile-time interface checking for all services
+- **Context Support**: All methods accept `context.Context` for cancellation and timeouts
+- **Comprehensive Error Handling**: Detailed error types for all HTTP status codes
+- **CSV Export Support**: Download data in CSV format where available
+- **Query Builder**: Fluent interface for building complex query parameters
+- **Production Ready**: Follows proven architecture patterns from go-api-sdk-apple
 
-## Status
+## Installation
 
-[![Super Linter](<https://github.com/segraef/Template/actions/workflows/linter.yml/badge.svg>)](<https://github.com/segraef/Template/actions/workflows/linter.yml>)
+```bash
+go get github.com/deploymenttheory/go-api-sdk-workbrew
+```
 
-[![Sample Workflow](<https://github.com/segraef/Template/actions/workflows/workflow.yml/badge.svg>)](<https://github.com/segraef/Template/actions/workflows/workflow.yml>)
+## Quick Start
 
-## Creating a repository from a template
+```go
+package main
 
-You can [generate](https://github.com/segraef/Template/generate) a new repository with the same directory structure and files as an existing repository. More details can be found [here][CreateFromTemplate].
+import (
+    "context"
+    "fmt"
+    "log"
 
-## Reporting Issues and Feedback
+    "github.com/deploymenttheory/go-api-sdk-workbrew/workbrew"
+)
 
-### Issues and Bugs
+func main() {
+    // Create a new client
+    client, err := workbrew.NewClient(
+        "your-api-key",
+        "your-workspace-name",
+    )
+    if err != nil {
+        log.Fatal(err)
+    }
 
-If you find any bugs, please file an issue in the [GitHub Issues][GitHubIssues] page. Please fill out the provided template with the appropriate information.
+    ctx := context.Background()
 
-If you are taking the time to mention a problem, even a seemingly minor one, it is greatly appreciated, and a totally valid contribution to this project. **Thank you!**
+    // Get all devices
+    devices, err := client.Devices.GetDevices(ctx)
+    if err != nil {
+        log.Fatal(err)
+    }
 
-## Feedback
+    for _, device := range *devices {
+        fmt.Printf("Device: %s\n", device.SerialNumber)
+    }
+}
+```
 
-If there is a feature you would like to see in here, please file an issue or feature request in the [GitHub Issues][GitHubIssues] page to provide direct feedback.
+## Environment Variables
 
-## Contribution
+You can also create a client from environment variables:
 
-If you would like to become an active contributor to this repository or project, please follow the instructions provided in [`CONTRIBUTING.md`][Contributing].
+```bash
+export WORKBREW_API_KEY="your-api-key"
+export WORKBREW_WORKSPACE="your-workspace"
+export WORKBREW_BASE_URL="https://console.workbrew.com"  # optional
+export WORKBREW_API_VERSION="v0"  # optional
+```
 
-## Learn More
+```go
+client, err := workbrew.NewClientFromEnv()
+```
 
-* [GitHub Documentation][GitHubDocs]
-* [Azure DevOps Documentation][AzureDevOpsDocs]
-* [Microsoft Azure Documentation][MicrosoftAzureDocs]
+## Available Services
 
-<!-- References -->
+All 13 Workbrew API services are supported:
 
-<!-- Local -->
-[ProjectSetup]: <https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions>
-[CreateFromTemplate]: <https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-on-github/creating-a-repository-from-a-template>
-[GitHubDocs]: <https://docs.github.com/>
-[AzureDevOpsDocs]: <https://docs.microsoft.com/en-us/azure/devops/?view=azure-devops>
-[GitHubIssues]: <https://github.com/segraef/Template/issues>
-[Contributing]: CONTRIBUTING.md
+### 1. Analytics
+```go
+// Get analytics data
+analytics, err := client.Analytics.GetAnalytics(ctx)
+csvData, err := client.Analytics.GetAnalyticsCSV(ctx)
+```
 
-<!-- External -->
-[Az]: <https://img.shields.io/powershellgallery/v/Az.svg?style=flat-square&label=Az>
-[AzGallery]: <https://www.powershellgallery.com/packages/Az/>
-[PowerShellCore]: <https://github.com/PowerShell/PowerShell/releases/latest>
+### 2. Brew Commands
+```go
+// List brew commands
+commands, err := client.BrewCommands.GetBrewCommands(ctx)
 
-<!-- Docs -->
-[MicrosoftAzureDocs]: <https://docs.microsoft.com/en-us/azure/>
-[PowerShellDocs]: <https://docs.microsoft.com/en-us/powershell/>
+// Create a new brew command
+request := &brewcommands.CreateBrewCommandRequest{
+    Arguments: "install wget",
+}
+response, err := client.BrewCommands.CreateBrewCommand(ctx, request)
+
+// Get command runs
+runs, err := client.BrewCommands.GetBrewCommandRuns(ctx, "command-label")
+```
+
+### 3. Brew Configurations
+```go
+configs, err := client.BrewConfigurations.GetBrewConfigurations(ctx)
+```
+
+### 4. Brew Taps
+```go
+taps, err := client.BrewTaps.GetBrewTaps(ctx)
+```
+
+### 5. Brewfiles (Full CRUD)
+```go
+// List brewfiles
+brewfiles, err := client.Brewfiles.GetBrewfiles(ctx)
+
+// Create a brewfile
+request := &brewfiles.CreateBrewfileRequest{
+    Label:   "my-brewfile",
+    Content: "brew \"wget\"",
+}
+created, err := client.Brewfiles.CreateBrewfile(ctx, request)
+
+// Update a brewfile
+updateReq := &brewfiles.UpdateBrewfileRequest{
+    Content: "brew \"wget\"\nbrew \"htop\"",
+}
+updated, err := client.Brewfiles.UpdateBrewfile(ctx, "my-brewfile", updateReq)
+
+// Delete a brewfile
+deleted, err := client.Brewfiles.DeleteBrewfile(ctx, "my-brewfile")
+
+// Get brewfile runs
+runs, err := client.Brewfiles.GetBrewfileRuns(ctx, "my-brewfile")
+```
+
+### 6. Casks
+```go
+casks, err := client.Casks.GetCasks(ctx)
+```
+
+### 7. Device Groups
+```go
+groups, err := client.DeviceGroups.GetDeviceGroups(ctx)
+```
+
+### 8. Devices
+```go
+devices, err := client.Devices.GetDevices(ctx)
+csvData, err := client.Devices.GetDevicesCSV(ctx)
+```
+
+### 9. Events
+```go
+// Get all events
+events, err := client.Events.GetEvents(ctx, "")
+
+// Filter by actor type
+userEvents, err := client.Events.GetEvents(ctx, "user")
+systemEvents, err := client.Events.GetEvents(ctx, "system")
+
+// Export to CSV with download flag
+csvData, err := client.Events.GetEventsCSV(ctx, "user", true)
+```
+
+### 10. Formulae
+```go
+formulae, err := client.Formulae.GetFormulae(ctx)
+```
+
+### 11. Licenses
+```go
+licenses, err := client.Licenses.GetLicenses(ctx)
+```
+
+### 12. Vulnerabilities
+```go
+vulns, err := client.Vulnerabilities.GetVulnerabilities(ctx)
+
+// Note: May return 403 on Free tier plans
+```
+
+### 13. Vulnerability Changes
+```go
+// Get all vulnerability changes
+changes, err := client.VulnerabilityChanges.GetVulnerabilityChanges(ctx, "", "")
+
+// Filter by status
+detected, err := client.VulnerabilityChanges.GetVulnerabilityChanges(ctx, "detected", "")
+fixed, err := client.VulnerabilityChanges.GetVulnerabilityChanges(ctx, "fixed", "")
+
+// Search for specific vulnerabilities
+results, err := client.VulnerabilityChanges.GetVulnerabilityChanges(ctx, "detected", "curl")
+
+// Export to CSV
+csvData, err := client.VulnerabilityChanges.GetVulnerabilityChangesCSV(ctx, "detected", "curl", true)
+```
+
+## Error Handling
+
+The SDK provides detailed error types and helper functions:
+
+```go
+devices, err := client.Devices.GetDevices(ctx)
+if err != nil {
+    // Check for specific error types
+    if workbrewclient.IsUnauthorized(err) {
+        log.Fatal("Invalid API key")
+    }
+
+    if workbrewclient.IsForbidden(err) {
+        log.Fatal("Access forbidden")
+    }
+
+    if workbrewclient.IsFreeTierError(err) {
+        log.Fatal("Feature not available on free tier")
+    }
+
+    if workbrewclient.IsNotFound(err) {
+        log.Fatal("Resource not found")
+    }
+
+    if workbrewclient.IsValidationError(err) {
+        log.Fatal("Validation error")
+    }
+
+    log.Fatal(err)
+}
+```
+
+## Client Options
+
+Customize client behavior with functional options:
+
+```go
+client, err := workbrew.NewClient(
+    "your-api-key",
+    "your-workspace",
+    client.WithBaseURL("https://custom-url.com"),
+    client.WithTimeout(30),
+    client.WithRetryCount(3),
+    client.WithAPIVersion("v0"),
+    client.WithDebug(),
+)
+```
+
+## Query Builder
+
+For endpoints with complex query parameters:
+
+```go
+// Build query parameters
+queryParams := client.QueryBuilder().
+    AddString("filter", "user").
+    AddInt("limit", 100).
+    AddBool("include_deleted", false).
+    Build()
+
+// Use with custom API calls if needed
+```
+
+## API Documentation
+
+For complete API documentation, see:
+- [Workbrew API Documentation](https://console.workbrew.com/api-docs)
+- [SDK Implementation Status](./SDK_IMPLEMENTATION_COMPLETE.md)
+
+## Architecture
+
+This SDK follows the same architecture pattern as the [go-api-sdk-apple](https://github.com/deploymenttheory/go-api-sdk-apple) project:
+
+- **Service Interface Pattern**: Each service defines an interface with compile-time checking
+- **Consistent Error Handling**: All HTTP status codes properly handled with helper functions
+- **Type-Safe Models**: Request/response types for all endpoints
+- **Context Support**: All operations support cancellation and timeouts
+
+## Requirements
+
+- Go 1.21 or higher
+- Valid Workbrew API key
+- Workbrew workspace name
+
+## Dependencies
+
+- [resty.dev/v3](https://github.com/go-resty/resty) - HTTP client
+- [go.uber.org/zap](https://github.com/uber-go/zap) - Structured logging
+
+## Contributing
+
+This is an internal SDK following the deployment theology architecture standards. For issues or feature requests, please contact the development team.
+
+## License
+
+Copyright © 2024 Deployment Theology. All rights reserved.
+
+## Related Projects
+
+- [go-api-sdk-apple](https://github.com/deploymenttheory/go-api-sdk-apple) - Apple Business Manager/School Manager Go SDK

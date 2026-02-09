@@ -1,0 +1,2175 @@
+---
+openapi: 3.0.1
+info:
+  title: Workbrew API
+  version: v0
+paths:
+  "/workspaces/{workspace_name}/analytics.json":
+    get:
+      summary: Returns a list of Analytics
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Analytics Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    device:
+                      type: string
+                      example: TC6R2DHVHG
+                    command:
+                      type: string
+                      example: brew install curl
+                    last_run:
+                      type: string
+                      format: date_time
+                      example: '2024-01-01T12:34:56Z'
+                    count:
+                      type: integer
+                      example: 2
+                  required:
+                  - device
+                  - command
+                  - last_run
+                  - count
+                  additionalProperties: false
+  "/workspaces/{workspace_name}/analytics.csv":
+    get:
+      summary: Returns a list of Analytics
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Analytics Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |-
+                  device,command,last_run,count
+                  TC6R2DHVHG,brew install curl,2024-01-01T12:34:56Z,2
+                  TC6R2DHVHG,brew install wget,2024-02-03T08:22:33Z,1
+                  TC6R2DHVHG,brew info curl,2024-04-15T14:45:22Z,1
+  "/workspaces/{workspace_name}/brew_commands/{brew_command_label}/runs.json":
+    get:
+      summary: Returns a list of Brew Command Runs
+      parameters:
+      - name: brew_command_label
+        in: path
+        description: Brew Command Label
+        required: true
+        schema:
+          type: string
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: Brew Command Runs Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    command:
+                      type: string
+                      example: brew outdated
+                    label:
+                      type: string
+                      example: outdated
+                    device:
+                      type: string
+                      example: TC6R2DHVHG
+                    created_at:
+                      type: string
+                      format: date-time
+                      example: '2023-11-01T12:34:56.000Z'
+                    updated_at:
+                      type: string
+                      format: date-time
+                      example: '2023-11-01T21:43:12.000Z'
+                    success:
+                      type: boolean
+                      example: true
+                    output:
+                      type: string
+                      example: |-
+                        curl
+                        git
+                    started_at:
+                      type: string
+                      oneOf:
+                      - format: date-time
+                      - enum:
+                        - Not Started
+                      example: '2023-11-01T12:34:56.000Z'
+                    finished_at:
+                      type: string
+                      oneOf:
+                      - format: date-time
+                      - enum:
+                        - Not Finished
+                      example: '2023-11-01T21:43:12.000Z'
+  "/workspaces/{workspace_name}/brew_commands/{brew_command_label}/runs.csv":
+    get:
+      summary: Returns a list of Brew Command Runs
+      parameters:
+      - name: brew_command_label
+        in: path
+        description: Brew Command Label
+        required: true
+        schema:
+          type: string
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: Brew Command Runs Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  command,label,device,created_at,updated_at,success,output,started_at,finished_at
+                  brew outdated,outdated,TC6R2DHVHG,2025-07-03 12:50:45 UTC,2025-07-03 12:50:45 UTC,true,c-ares\nlibuv,2023-11-01 12:34:56 UTC,2023-11-01 21:43:12 UTC
+                  brew outdated,outdated,1234567890,2025-07-03 12:50:45 UTC,2025-07-03 12:50:45 UTC,false,python-argcomplete,2023-11-01 12:34:56 UTC,2023-11-01 21:43:12 UTC
+  "/workspaces/{workspace_name}/brewfiles/{label}/runs.json":
+    get:
+      summary: Returns a list of Brewfile Runs
+      parameters:
+      - name: label
+        in: path
+        description: Brewfile Label
+        required: true
+        schema:
+          type: string
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: Brewfile Runs Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    label:
+                      type: string
+                      example: bundle-file
+                    device:
+                      type: string
+                      example: TC6R2DHVHG
+                    created_at:
+                      type: string
+                      format: date-time
+                      example: '2023-11-01T12:34:56.000Z'
+                    updated_at:
+                      type: string
+                      format: date-time
+                      example: '2023-11-01T21:43:12.000Z'
+                    success:
+                      type: boolean
+                      example: true
+                    output:
+                      type: string
+                      example: |-
+                        Using git
+                        `brew bundle` complete! 1 Brewfile dependency now installed.
+                    started_at:
+                      type: string
+                      oneOf:
+                      - format: date-time
+                      - enum:
+                        - Not Started
+                      example: '2023-11-01T12:34:56.000Z'
+                    finished_at:
+                      type: string
+                      oneOf:
+                      - format: date-time
+                      - enum:
+                        - Not Finished
+                      example: '2023-11-01T21:43:12.000Z'
+  "/workspaces/{workspace_name}/brewfiles/{label}/runs.csv":
+    get:
+      summary: Returns a list of Brewfile Runs
+      parameters:
+      - name: label
+        in: path
+        description: Brewfile Label
+        required: true
+        schema:
+          type: string
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: Brewfile Runs Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  label,device,created_at,updated_at,success,output,started_at,finished_at
+                  bundle-file,TC6R2DHVHG,2025-07-03 12:50:45 UTC,2025-07-03 12:50:45 UTC,false,"",Not Started,Not Finished
+  "/workspaces/{workspace_name}/brew_commands.json":
+    get:
+      summary: Returns a list of Brew Commands
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Brew Commands Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    command:
+                      type: string
+                      example: brew outdated
+                    label:
+                      type: string
+                      example: outdated
+                    last_updated_by_user:
+                      type: string
+                      example: mikemcquaid
+                    started_at:
+                      type: string
+                      oneOf:
+                      - format: date-time
+                      - enum:
+                        - Not Started
+                      example: '2023-11-01T12:34:56.000Z'
+                    finished_at:
+                      type: string
+                      oneOf:
+                      - format: date-time
+                      - enum:
+                        - Not Finished
+                      example: '2023-11-01T21:43:12.000Z'
+                    devices:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                      - TC6R2DHVHG
+                    run_count:
+                      type: integer
+                      example: 2
+    post:
+      summary: Creates a new Brew Command
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '201':
+          description: Brew Command created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Brew Command was successfully created.
+                required:
+                - message
+                additionalProperties: false
+        '403':
+          description: On a Free tier plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: An error occurred when trying to create Brew Command
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Please upgrade your plan to get access to Brew Commands.
+        '422':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: An error occurred when trying to create Brew Command
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Arguments cannot include `&&`
+                required:
+                - message
+                - errors
+                additionalProperties: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arguments:
+                  type: string
+                  example: install wget
+                device_ids:
+                  type: string
+                  format: uuid
+                  example: c206cdc6-f01c-5859-899d-7fd0a546e888,f7b3bb3c-6b3e-5e3a-bcb5-66c49e1c5fcb
+                run_after_datetime:
+                  type: string
+                  format: date_time
+                  example: 2025-01-10T10:09
+                recurrence:
+                  type: string
+                  enum:
+                  - once
+                  - daily
+                  - weekly
+                  - monthly
+                  example: once
+              required:
+              - arguments
+              additionalProperties: false
+  "/workspaces/{workspace_name}/brew_commands.csv":
+    get:
+      summary: Returns a list of Brew Commands
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Brew Commands Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  command,label,last_updated_by_user,started_at,finished_at,devices,run_count
+                  brew outdated,outdated,mikemcquaid,2023-11-01 12:34:56 UTC,2023-11-01 21:43:12 UTC,"",2
+                  brew list --versions --formula,list-versions-formula,onboarded,2023-11-01 12:34:56 UTC,Not Finished,TC6R2DHVHG,1
+                  brew list --versions --cask,list-versions-cask,onboarding,Not Started,Not Finished,"",1
+                  brew --version,version,mikemcquaid,Not Started,Not Finished,"",0
+                  brew install git,install-git,mikemcquaid,Not Started,Not Finished,"",0
+                  brew install zx,install-zx,mikemcquaid,Not Started,Not Finished,"",0
+                  brew install node,install-node,mikemcquaid,Not Started,Not Finished,"",0
+                  brew install deno,install-deno,mikemcquaid,Not Started,Not Finished,"",0
+                  brew install ruby,install-ruby,mikemcquaid,Not Started,Not Finished,"",0
+                  brew install javascript,install-javascript,mikemcquaid,Not Started,Not Finished,"",0
+                  brew install rust,install-rust,mikemcquaid,Not Started,Not Finished,"",0
+                  brew install golang,install-golang,mikemcquaid,Not Started,Not Finished,"",0
+                  brew install c++,install-c++,mikemcquaid,Not Started,Not Finished,"",0
+                  brew install nonexistent,install-nonexistent,mikemcquaid,2023-11-01 12:34:56 UTC,2023-11-01 21:43:12 UTC,"",1
+                  brew install hello,install-hello,mikemcquaid,Not Started,Not Finished,"",0
+                  brew upgrade curl,upgrade-curl,mikemcquaid,2024-11-01 12:34:56 UTC,2024-11-01 21:43:12 UTC,"",1
+                  brew upgrade ack,upgrade-ack,mikemcquaid,2024-11-01 12:34:56 UTC,2024-11-01 21:43:12 UTC,"",1
+  "/workspaces/{workspace_name}/brew_configurations.json":
+    get:
+      summary: Returns a list of Brew Configurations
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Brew Configurations Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                      example: HOMEBREW_DEVELOPER
+                    value:
+                      type: string
+                      example: '1'
+                    last_updated_by_user:
+                      type: string
+                      example: mikemcquaid
+                    device_group:
+                      type: string
+                      example: All Devices
+                  required:
+                  - key
+                  - value
+                  - last_updated_by_user
+                  - device_group
+                  additionalProperties: false
+  "/workspaces/{workspace_name}/brew_configurations.csv":
+    get:
+      summary: Returns a list of Brew Configurations
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Brew Configurations Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |-
+                  key,value,last_updated_by_user,device_group
+                  HOMEBREW_DEVELOPER,1,mikemcquaid,All Devices
+                  HOMEBREW_API_AUTO_UPDATE_SECS,1,mikemcquaid,All Devices
+                  HOMEBREW_FORBIDDEN_FORMULAE,util-linux ruby,mikemcquaid,All Devices
+                  HOMEBREW_FORBIDDEN_CASKS,1password-cli,mikemcquaid,All Devices
+  "/workspaces/{workspace_name}/brew_taps.json":
+    get:
+      summary: Returns a list of Taps
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Taps Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tap:
+                      type: string
+                      example: Homebrew/homebrew-core
+                    devices:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                      - TC6R2DHVHG
+                      - '1234567890'
+                    formulae_installed:
+                      type: integer
+                      example: 10
+                    casks_installed:
+                      type: integer
+                      example: 0
+                    available_packages:
+                      type: string
+                      example: 16 Formulae
+                  required:
+                  - tap
+                  - devices
+                  - formulae_installed
+                  - casks_installed
+                  - available_packages
+                  additionalProperties: false
+  "/workspaces/{workspace_name}/brew_taps.csv":
+    get:
+      summary: Returns a list of Taps
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Taps Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |-
+                  tap,devices,formulae_installed,casks_installed,available_packages
+                  Homebrew/homebrew-core,"TC6R2DHVHG, 1234567890",10,0,7388 Formulae
+                  Homebrew/homebrew-cask,TC6R2DHVHG,0,2,4901 Casks and 2411 Cask fonts
+                  apple/apple,TC6R2DHVHG,1,0,>=1 Packages
+                  workbrew/private,TC6R2DHVHG,0,1,>=1 Packages
+  "/workspaces/{workspace_name}/casks.json":
+    get:
+      summary: Returns a list of Casks
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Casks Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: logi-options+
+                    display_name:
+                      type: string
+                      nullable: true
+                      example: Logitech Options+
+                    devices:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                      - TC6R2DHVHG
+                      - '1234567890'
+                    outdated:
+                      type: boolean
+                      example: true
+                    deprecated:
+                      type: string
+                      nullable: true
+                      example: ''
+                    homebrew_cask_version:
+                      type:
+                      - string
+                      - 'null'
+                      example: 8.11.0_1
+                  required:
+                  - name
+                  - devices
+                  - outdated
+                  - deprecated
+                  - homebrew_cask_version
+                  additionalProperties: false
+  "/workspaces/{workspace_name}/casks.csv":
+    get:
+      summary: Returns a list of Casks
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Brew Packages Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |-
+                  name,devices,outdated,deprecated,homebrew_cask_version
+                  1password,"[""TC6R2DHVHG""]",true,"",8.10.75
+                  1password-cli,"[""TC6R2DHVHG""]",true,"",2.31.0
+                  logi-options+,"[""TC6R2DHVHG""]",true,"",1.89.705126
+                  workbrew/private/workbrew,"[""TC6R2DHVHG""]",false,"",0.0.5
+  "/workspaces/{workspace_name}/brewfiles.json":
+    get:
+      summary: Returns a list of Brewfiles
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Brewfiles with parameterized slugs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                      example: my-brewfile
+                    slug:
+                      type: string
+                      example: my-brewfile
+                    content:
+                      type: string
+                      example: brew "wget"
+                    last_updated_by_user:
+                      type: string
+                      example: onboarded
+                    started_at:
+                      type: string
+                      oneOf:
+                      - format: date-time
+                      - enum:
+                        - Not Started
+                      example: Not Started
+                    finished_at:
+                      type: string
+                      oneOf:
+                      - format: date-time
+                      - enum:
+                        - Not Finished
+                      example: Not Finished
+                    devices:
+                      type: array
+                      items:
+                        type: object
+                      example: []
+                    run_count:
+                      type: integer
+                      example: 1
+                  required:
+                  - last_updated_by_user
+                  - started_at
+                  - finished_at
+                  - devices
+                  - run_count
+                  additionalProperties: false
+        '403':
+          description: On a Free tier plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Brewfiles API is not available on your current plan.
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Brewfiles cannot be created or updated on a Workbrew
+                        Free subscription.
+    post:
+      summary: Creates a new Brewfile
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '201':
+          description: Brewfile created (for a device group)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Brewfile was successfully created.
+                required:
+                - message
+                additionalProperties: false
+        '403':
+          description: On a Free tier plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Brewfiles API is not available on your current plan.
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Brewfiles cannot be created or updated on a Workbrew
+                        Free subscription.
+        '422':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: An error occurred when trying to create Brewfile
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Please upgrade your plan to get access to Brew Commands.
+                required:
+                - message
+                - errors
+                additionalProperties: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+                  example: my-brewfile
+                content:
+                  type: string
+                  example: brew "wget"
+                device_serial_numbers:
+                  type: string
+                  example: TC6R2DHVHG,1234567890
+                  description: A comma-separated list of device serial numbers.
+                  nullable: true
+                device_group_id:
+                  type: string
+                  example: ddba0af6-bd3c-5abf-8311-e62dc6bd9fbc
+                  description: The ID of a device group to target.
+                  nullable: true
+              required:
+              - label
+              - content
+              additionalProperties: false
+  "/workspaces/{workspace_name}/brewfiles.csv":
+    get:
+      summary: Returns a list of Brewfiles
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Brewfiles Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |-
+                  last_updated_by_user,started_at,finished_at,devices,run_count
+                  bundle-file,onboarded,Not Started,Not Finished,TC6R2DHVHG,1
+  "/workspaces/{workspace_name}/brewfiles/{label}.json":
+    delete:
+      summary: Deletes a Brewfile
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      - name: label
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Brewfile deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Brewfile was successfully destroyed.
+                required:
+                - message
+                additionalProperties: false
+        '403':
+          description: On a Free tier plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Brewfiles API is not available on your current plan.
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Brewfiles cannot be created or updated on a Workbrew
+                        Free subscription.
+    put:
+      summary: Updates a Brewfile
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      - name: label
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Brewfile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Brewfile was successfully updated.
+                required:
+                - message
+                additionalProperties: false
+        '422':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: An error occurred when trying to update Brewfile
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: 'Brewfile has an invalid line: tap "foo/bar/baz"'
+                required:
+                - message
+                - errors
+                additionalProperties: false
+        '403':
+          description: On a Free tier plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Brewfiles API is not available on your current plan.
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Brewfiles cannot be created or updated on a Workbrew
+                        Free subscription.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: |-
+                    brew "wget"
+                    brew "htop"
+                device_serial_numbers:
+                  type: string
+                  example: '1234567890'
+                  description: A comma-separated list of device serial numbers.
+                  nullable: true
+                device_group_id:
+                  type: string
+                  example: ddba0af6-bd3c-5abf-8311-e62dc6bd9fbc
+                  description: The ID of a device group to target.
+                  nullable: true
+              required:
+              - content
+              additionalProperties: false
+  "/workspaces/{workspace_name}/device_groups.json":
+    get:
+      summary: Returns a list of Device Groups
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Device Groups Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: ddba0af6-bd3c-5abf-8311-e62dc6bd9fbc
+                    name:
+                      type: string
+                      example: Admin
+                    devices:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                      - TC6R2DHVHG
+                  required:
+                  - id
+                  - name
+                  - devices
+                  additionalProperties: false
+  "/workspaces/{workspace_name}/device_groups.csv":
+    get:
+      summary: Returns a list of Device Groups
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Device Groups Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |-
+                  id,name,devices
+                  ddba0af6-bd3c-5abf-8311-e62dc6bd9fbc,Admin,
+                  377d8aa2-64cd-56a6-8351-6163bcf7dca1,OSX 14,TC6R2DHVHG
+  "/workspaces/{workspace_name}/devices.json":
+    get:
+      summary: Returns a list of devices
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: devices found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    serial_number:
+                      type: string
+                      example: TC6R2DHVHG
+                    groups:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                      - OSX 14
+                    mdm_user_or_device_name:
+                      type: string
+                      nullable: true
+                      example: Mike's MacBook Pro
+                    last_seen_at:
+                      type: string
+                      oneOf:
+                      - format: date-time
+                      - enum:
+                        - Never
+                      example: '2023-08-25T00:00:00.000Z'
+                    command_last_run_at:
+                      type: string
+                      oneOf:
+                      - format: date-time
+                      - enum:
+                        - Never
+                      example: '2024-01-01T00:00:00.000Z'
+                    device_type:
+                      type: string
+                      example: MacBook Pro
+                    os_version:
+                      type: string
+                      example: macOS 14.0 (23A344)
+                    homebrew_prefix:
+                      type: string
+                      example: "/opt/homebrew"
+                    homebrew_version:
+                      type: string
+                      example: 4.1.15-24-g5e78ba3
+                    workbrew_version:
+                      type: string
+                      example: 0.2.1
+                    formulae_count:
+                      type: integer
+                      example: 9
+                    casks_count:
+                      type: integer
+                      example: 3
+  "/workspaces/{workspace_name}/devices.csv":
+    get:
+      summary: Returns a list of devices
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: devices found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |-
+                  serial_number,groups,mdm_user_or_device_name,last_seen_at," \
+                            "command_last_run_at,device_type,os_version,homebrew_prefix,homebrew_version,workbrew_version," \
+                            "formulae_count,casks_count
+                  TC6R2DHVHG,"[""OSX 14""]",Mike's MacBook Pro,2023-08-25 00:00:00 UTC,2024-01-01 00:00:00 UTC,MacBook Pro," \
+                    "macOS 14.0 (23A344),/opt/homebrew,4.1.15-24-g5e78ba3,0.2.1,9,3
+                  1234567890,[],Never,Never,Mac mini,macOS 13,/usr/local,4.0.0,0.1.6-1-geb5f975,3,0
+                  AB3456DG90,[],Never,Never,Unknown,Unknown,Unknown,Unknown,Unknown,0,0
+                  d6297bb0816f4832af4067203686df26,[],Never,Never,MX33-BS1-V1,Ubuntu 5.15.0-124.134-generic 5.15.163,"\
+                    "/home/linuxbrew/.linuxbrew,Unknown,0.9.12,0,0
+  "/workspaces/{workspace_name}/events.json":
+    get:
+      summary: Returns a list of audit log events
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      - name: filter
+        in: query
+        type: string
+        required: false
+        description: 'Filter by actor type: user, system, or all'
+        schema:
+          enum:
+          - user
+          - system
+          - all
+      responses:
+        '200':
+          description: update events include changes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                      example: 123e4567-e89b-12d3-a456-426614174000
+                    event_type:
+                      type: string
+                      example: device.created
+                    occurred_at:
+                      type: string
+                      format: date-time
+                      example: '2024-03-01T10:00:00Z'
+                    actor_id:
+                      type:
+                      - string
+                      - 'null'
+                      format: uuid
+                      nullable: true
+                    actor_type:
+                      type:
+                      - string
+                      - 'null'
+                      nullable: true
+                      example: User
+                    target_id:
+                      type:
+                      - string
+                      - 'null'
+                      format: uuid
+                      nullable: true
+                    target_type:
+                      type:
+                      - string
+                      - 'null'
+                      nullable: true
+                      example: Device
+                    target_identifier:
+                      type:
+                      - string
+                      - 'null'
+                      nullable: true
+                      example: TC6R2DHVHG
+                    target_snapshot:
+                      type: object
+                      nullable: true
+                      additionalProperties: true
+                      description: Present only when target is deleted
+                    changes:
+                      type: object
+                      nullable: true
+                      additionalProperties: true
+                      description: Present only for update events
+                  required:
+                  - id
+                  - event_type
+                  - occurred_at
+                  - actor_id
+                  - actor_type
+                  - target_id
+                  - target_type
+                  - target_identifier
+  "/workspaces/{workspace_name}/events.csv":
+    get:
+      summary: Returns audit log events as CSV
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      - name: filter
+        in: query
+        required: false
+        description: 'Filter by actor type: user, system, or all'
+        schema:
+          type: string
+      - name: download
+        in: query
+        required: false
+        description: Set to 1 to force download as attachment
+        schema:
+          type: string
+      responses:
+        '200':
+          description: CSV with download parameter
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  id,event_type,occurred_at,actor_id,actor_type,target_id,target_type,target_identifier
+                  123e4567-e89b-12d3-a456-426614174000,device.created,2024-03-01T10:00:00Z,,,123e4567-e89b-12d3-a456-426614174001,Device,TC6R2DHVHG
+  "/workspaces/{workspace_name}/formulae.json":
+    get:
+      summary: Returns a list of Formulae
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Brew Formulae Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: curl
+                    devices:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                      - TC6R2DHVHG
+                      - '1234567890'
+                    outdated:
+                      type: boolean
+                      example: true
+                    installed_on_request:
+                      type: boolean
+                      example: false
+                    installed_as_dependency:
+                      type: boolean
+                      example: true
+                    vulnerabilities:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                      - CVE-2024-2466
+                      - THIS-IS-AN-INVALID-CVE-001
+                    deprecated:
+                      type: string
+                      nullable: true
+                      example: ''
+                    license:
+                      type:
+                      - array
+                      - 'null'
+                      items:
+                        type: string
+                      example:
+                      - curl
+                    homebrew_core_version:
+                      type:
+                      - string
+                      - 'null'
+                      example: 8.11.0_1
+                  required:
+                  - name
+                  - devices
+                  - outdated
+                  - installed_on_request
+                  - installed_as_dependency
+                  - vulnerabilities
+                  - deprecated
+                  - license
+                  - homebrew_core_version
+                  additionalProperties: false
+  "/workspaces/{workspace_name}/formulae.csv":
+    get:
+      summary: Returns a list of Formulae
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Formulae Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |-
+                  name,devices,outdated,installed_on_request,installed_as_dependency,"\
+                            "vulnerabilities,deprecated,license,homebrew_core_version
+                  curl,"TC6R2DHVHG, 1234567890",true,false,true,"CVE-2024-11053, CVE-2024-6197, CVE-2024-7264, CVE-2024-8096, "\
+                    "CVE-2024-9681, THIS-IS-AN-INVALID-CVE-001","",curl,8.11.1
+                  actionlint,TC6R2DHVHG,true,false,false,"","",MIT,1.7.7
+                  ack,TC6R2DHVHG,true,false,false,SOME-INVALID-CVE-001,"",Artistic-2.0,3.8.1
+                  cweb,1234567890,true,false,false,"","",LicenseRef-Homebrew-cannot-represent,4.12.1
+                  renovate,TC6R2DHVHG,true,false,false,GHSA-rqgv-292v-5qgr,"",AGPL-3.0-only,39.125.0
+                  wget,TC6R2DHVHG,true,true,false,"CVE-2024-10524, SOME-INVALID-CVE-002","",GPL-3.0-or-later,1.25.0
+                  zstd,1234567890,true,false,false,"","","(BSD-3-Clause OR GPL-2.0-only), BSD-2-Clause, MIT",1.5.6
+                  apple/apple/game-porting-toolkit,TC6R2DHVHG,false,false,false,"","",,
+                  rdup,TC6R2DHVHG,false,false,false,"",Disabled,GPL-3.0-or-later,1.1.15_2
+                  flac,TC6R2DHVHG,false,false,false,"","","BSD-3-Clause, GPL-2.0-or-later, ISC, LGPL-2.0-or-later, " \
+                    "LGPL-2.1-or-later, LicenseRef-Homebrew-public-domain, (GPL-2.0-or-later OR LGPL-2.1-or-later)",1.4.3
+                  rbenv-communal-gems,TC6R2DHVHG,false,false,false,"",Deprecated,MIT,1.0.1_1
+  "/workspaces/{workspace_name}/licenses.json":
+    get:
+      summary: Returns a list of Licenses
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Licenses Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: GPL-3.0-or-later
+                    device_count:
+                      type: integer
+                      example: 2
+                    formula_count:
+                      type: integer
+                      example: 2
+                  required:
+                  - name
+                  - device_count
+                  - formula_count
+                  additionalProperties: false
+  "/workspaces/{workspace_name}/licenses.csv":
+    get:
+      summary: Returns a list of Licenses
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Licenses Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |-
+                  name,device_count,formula_count
+                  GPL-3.0-or-later,2,2
+                  MIT,2,2
+                  LicenseRef-Homebrew-cannot-represent,1,1
+                  BSD-3-Clause AND GPL-2.0-or-later AND ISC AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND LicenseRef-Homebrew-public-domain AND (GPL-2.0-or-later OR LGPL-2.1-or-later),1,1
+                  (BSD-3-Clause OR GPL-2.0-only) AND BSD-2-Clause AND MIT,1,1
+                  curl,1,1
+                  Artistic-2.0,1,1
+                  AGPL-3.0-only,1,1
+                  Unknown,1,0
+  "/workspaces/{workspace_name}/vulnerabilities.json":
+    get:
+      summary: Returns a list of Vulnerabilities
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Vulnerabilities Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    vulnerabilities:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          clean_id:
+                            type: string
+                            example: CVE-2024-2466
+                          cvss_score:
+                            type:
+                            - number
+                            - 'null'
+                            example: 6.5
+                        required:
+                        - clean_id
+                        - cvss_score
+                        additionalProperties: false
+                      example:
+                      - clean_id: CVE-2024-2466
+                        cvss_score: 6.5
+                      - clean_id: THIS-IS-AN-INVALID-CVE-001
+                        cvss_score: 8.0
+                    formula:
+                      type: string
+                      example: curl
+                    outdated_devices:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                      - TC6R2DHVHG
+                      - '1234567890'
+                    supported:
+                      type: boolean
+                      example: false
+                    homebrew_core_version:
+                      type: string
+                      example: 8.11.0_1
+                  required:
+                  - vulnerabilities
+                  - formula
+                  - outdated_devices
+                  - supported
+                  - homebrew_core_version
+                  additionalProperties: false
+        '403':
+          description: On a Free tier plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: An error occurred when trying to view vulnerabilities
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Vulnerabilities cannot be viewed in detail or mitigated
+                        on a Workbrew Free subscription.
+  "/workspaces/{workspace_name}/vulnerabilities.csv":
+    get:
+      summary: Returns a list of Vulnerabilities
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      responses:
+        '200':
+          description: Vulnerabilities Found
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |-
+                  vulnerabilities,formula,outdated_devices,supported,homebrew_core_version
+                    "CVE-2024-11053, CVE-2024-6197, CVE-2024-7264, CVE-2024-8096, CVE-2024-9681, THIS-IS-AN-INVALID-CVE-001 (8.0)",curl,"TC6R2DHVHG, 1234567890",false,8.11.1
+                    "CVE-2024-10524, SOME-INVALID-CVE-002",wget,TC6R2DHVHG,false,1.25.0
+                    SOME-INVALID-CVE-001,ack,TC6R2DHVHG,false,3.8.1
+                    GHSA-rqgv-292v-5qgr (5.4),renovate,TC6R2DHVHG,false,39.125.0
+  "/workspaces/{workspace_name}/vulnerability_changes.json":
+    get:
+      summary: Returns a list of vulnerability change events
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      - name: status
+        in: query
+        type: string
+        required: false
+        description: 'Filter by status: detected or fixed'
+        schema:
+          enum:
+          - detected
+          - fixed
+      - name: query
+        in: query
+        required: false
+        description: Search query for formula name, version, vulnerability ID, or
+          device
+        schema:
+          type: string
+      responses:
+        '200':
+          description: includes all vulnerability data fields
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                      example: 123e4567-e89b-12d3-a456-426614174000
+                    event_type:
+                      type: string
+                      enum:
+                      - vulnerability.detected
+                      - vulnerability.fixed
+                      example: vulnerability.detected
+                    occurred_at:
+                      type: string
+                      format: date-time
+                      example: '2024-10-01T09:15:00Z'
+                    status:
+                      type: string
+                      enum:
+                      - detected
+                      - fixed
+                      example: detected
+                    device_id:
+                      type:
+                      - string
+                      - 'null'
+                      format: uuid
+                      nullable: true
+                    device_serial_number:
+                      type:
+                      - string
+                      - 'null'
+                      nullable: true
+                      example: TC6R2DHVHG
+                    formula_name:
+                      type: string
+                      example: curl
+                    formula_version:
+                      type: string
+                      example: 8.7.0
+                    vulnerability_id:
+                      type: string
+                      example: CVE-2024-2466
+                    cvss_severity:
+                      type:
+                      - string
+                      - 'null'
+                      nullable: true
+                      example: Medium
+                    cvss_score:
+                      type:
+                      - number
+                      - 'null'
+                      nullable: true
+                      example: 6.5
+                  required:
+                  - id
+                  - event_type
+                  - occurred_at
+                  - status
+                  - formula_name
+                  - formula_version
+                  - vulnerability_id
+  "/workspaces/{workspace_name}/vulnerability_changes.csv":
+    get:
+      summary: Returns vulnerability change events as CSV
+      security:
+      - Bearer: []
+      parameters:
+      - name: workspace_name
+        in: path
+        description: Workspace slug
+        required: true
+        schema:
+          type: string
+      - name: authorization
+        in: header
+        required: true
+        description: Bearer Authentication via User API key
+        schema:
+          type: string
+      - name: X-Workbrew-API-Version
+        in: header
+        schema:
+          type: string
+          enum:
+          - v0
+        required: false
+        description: Workbrew API Version
+      - name: status
+        in: query
+        required: false
+        description: 'Filter by status: detected or fixed'
+        schema:
+          type: string
+      - name: query
+        in: query
+        required: false
+        description: Search query
+        schema:
+          type: string
+      - name: download
+        in: query
+        required: false
+        description: Set to 1 to force download as attachment
+        schema:
+          type: string
+      responses:
+        '200':
+          description: CSV with status filter
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  id,event_type,occurred_at,status,device_id,device_serial_number,formula_name,formula_version,vulnerability_id,cvss_severity,cvss_score
+                  123e4567-e89b-12d3-a456-426614174000,vulnerability.detected,2024-10-01T09:15:00Z,detected,device-uuid,TC6R2DHVHG,curl,8.7.0,CVE-2024-2466,Medium,6.5
+servers:
+- url: https://{defaultHost}
+  variables:
+    defaultHost:
+      default: console.workbrew.com
