@@ -1,6 +1,6 @@
 # Workbrew Go SDK
 
-Official Go SDK for the [Workbrew API](https://console.workbrew.com/api-docs) v0.
+Community Go SDK for the [Workbrew API](https://console.workbrew.com/api-docs) v0.
 
 ## Features
 
@@ -246,7 +246,7 @@ client, err := workbrew.NewClient(
 For endpoints with complex query parameters:
 
 ```go
-// Build query parameters
+
 queryParams := client.QueryBuilder().
     AddString("filter", "user").
     AddInt("limit", 100).

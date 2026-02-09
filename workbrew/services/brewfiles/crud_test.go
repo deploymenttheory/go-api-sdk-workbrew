@@ -30,14 +30,14 @@ func setupMockClient(t *testing.T) (*Service, string) {
 	return NewService(httpClient), baseURL
 }
 
-func TestGetBrewfiles_Success(t *testing.T) {
+func TestListBrewfiles_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewfilesMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetBrewfiles(ctx)
+	result, err := service.ListBrewfiles(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -64,14 +64,14 @@ func TestGetBrewfiles_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewfiles_Unauthorized(t *testing.T) {
+func TestListBrewfiles_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewfilesMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetBrewfiles(ctx)
+	result, err := service.ListBrewfiles(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -80,14 +80,14 @@ func TestGetBrewfiles_Unauthorized(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewfilesCSV_Success(t *testing.T) {
+func TestListBrewfilesCSV_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewfilesMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.GetBrewfilesCSV(ctx)
+	csvData, err := service.ListBrewfilesCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -103,14 +103,14 @@ func TestGetBrewfilesCSV_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewfilesCSV_Unauthorized(t *testing.T) {
+func TestListBrewfilesCSV_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewfilesMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetBrewfilesCSV(ctx)
+	result, err := service.ListBrewfilesCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -353,7 +353,7 @@ func TestDeleteBrewfile_Unauthorized(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewfileRuns_Success(t *testing.T) {
+func TestListBrewfileRuns_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewfilesMock{}
 	mockHandler.RegisterMocks(baseURL)
@@ -361,7 +361,7 @@ func TestGetBrewfileRuns_Success(t *testing.T) {
 
 	ctx := context.Background()
 
-	result, err := service.GetBrewfileRuns(ctx, "my-brewfile")
+	result, err := service.ListBrewfileRuns(ctx, "my-brewfile")
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -387,12 +387,12 @@ func TestGetBrewfileRuns_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewfileRuns_EmptyLabel(t *testing.T) {
+func TestListBrewfileRuns_EmptyLabel(t *testing.T) {
 	service, _ := setupMockClient(t)
 
 	ctx := context.Background()
 
-	result, err := service.GetBrewfileRuns(ctx, "")
+	result, err := service.ListBrewfileRuns(ctx, "")
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -401,7 +401,7 @@ func TestGetBrewfileRuns_EmptyLabel(t *testing.T) {
 	assert.Equal(t, 0, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewfileRuns_Unauthorized(t *testing.T) {
+func TestListBrewfileRuns_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewfilesMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
@@ -409,7 +409,7 @@ func TestGetBrewfileRuns_Unauthorized(t *testing.T) {
 
 	ctx := context.Background()
 
-	result, err := service.GetBrewfileRuns(ctx, "my-brewfile")
+	result, err := service.ListBrewfileRuns(ctx, "my-brewfile")
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -418,7 +418,7 @@ func TestGetBrewfileRuns_Unauthorized(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewfileRunsCSV_Success(t *testing.T) {
+func TestListBrewfileRunsCSV_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewfilesMock{}
 	mockHandler.RegisterMocks(baseURL)
@@ -426,7 +426,7 @@ func TestGetBrewfileRunsCSV_Success(t *testing.T) {
 
 	ctx := context.Background()
 
-	csvData, err := service.GetBrewfileRunsCSV(ctx, "my-brewfile")
+	csvData, err := service.ListBrewfileRunsCSV(ctx, "my-brewfile")
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -441,12 +441,12 @@ func TestGetBrewfileRunsCSV_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewfileRunsCSV_EmptyLabel(t *testing.T) {
+func TestListBrewfileRunsCSV_EmptyLabel(t *testing.T) {
 	service, _ := setupMockClient(t)
 
 	ctx := context.Background()
 
-	result, err := service.GetBrewfileRunsCSV(ctx, "")
+	result, err := service.ListBrewfileRunsCSV(ctx, "")
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -455,7 +455,7 @@ func TestGetBrewfileRunsCSV_EmptyLabel(t *testing.T) {
 	assert.Equal(t, 0, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewfileRunsCSV_Unauthorized(t *testing.T) {
+func TestListBrewfileRunsCSV_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewfilesMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
@@ -463,7 +463,7 @@ func TestGetBrewfileRunsCSV_Unauthorized(t *testing.T) {
 
 	ctx := context.Background()
 
-	result, err := service.GetBrewfileRunsCSV(ctx, "my-brewfile")
+	result, err := service.ListBrewfileRunsCSV(ctx, "my-brewfile")
 
 	require.Error(t, err)
 	assert.Nil(t, result)

@@ -30,14 +30,14 @@ func setupMockClient(t *testing.T) (*Service, string) {
 	return NewService(httpClient), baseURL
 }
 
-func TestGetDeviceGroups_Success(t *testing.T) {
+func TestListDeviceGroups_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.DeviceGroupsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetDeviceGroups(ctx)
+	result, err := service.ListDeviceGroups(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -62,14 +62,14 @@ func TestGetDeviceGroups_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetDeviceGroups_Unauthorized(t *testing.T) {
+func TestListDeviceGroups_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.DeviceGroupsMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetDeviceGroups(ctx)
+	result, err := service.ListDeviceGroups(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -78,14 +78,14 @@ func TestGetDeviceGroups_Unauthorized(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetDeviceGroupsCSV_Success(t *testing.T) {
+func TestListDeviceGroupsCSV_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.DeviceGroupsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.GetDeviceGroupsCSV(ctx)
+	csvData, err := service.ListDeviceGroupsCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -101,14 +101,14 @@ func TestGetDeviceGroupsCSV_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetDeviceGroupsCSV_Unauthorized(t *testing.T) {
+func TestListDeviceGroupsCSV_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.DeviceGroupsMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetDeviceGroupsCSV(ctx)
+	result, err := service.ListDeviceGroupsCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

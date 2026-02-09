@@ -39,14 +39,14 @@ func setupMockClient(t *testing.T) (*Service, string) {
 	return NewService(httpClient), baseURL
 }
 
-func TestGetBrewCommands_Success(t *testing.T) {
+func TestListBrewCommands_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewCommandsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetBrewCommands(ctx)
+	result, err := service.ListBrewCommands(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -70,14 +70,14 @@ func TestGetBrewCommands_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewCommands_Unauthorized(t *testing.T) {
+func TestListBrewCommands_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewCommandsMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetBrewCommands(ctx)
+	result, err := service.ListBrewCommands(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

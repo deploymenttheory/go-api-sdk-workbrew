@@ -30,14 +30,14 @@ func setupMockClient(t *testing.T) (*Service, string) {
 	return NewService(httpClient), baseURL
 }
 
-func TestGetVulnerabilities_Success(t *testing.T) {
+func TestListVulnerabilities_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.VulnerabilitiesMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetVulnerabilities(ctx)
+	result, err := service.ListVulnerabilities(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -73,14 +73,14 @@ func TestGetVulnerabilities_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetVulnerabilities_Unauthorized(t *testing.T) {
+func TestListVulnerabilities_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.VulnerabilitiesMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetVulnerabilities(ctx)
+	result, err := service.ListVulnerabilities(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -89,14 +89,14 @@ func TestGetVulnerabilities_Unauthorized(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetVulnerabilities_Forbidden(t *testing.T) {
+func TestListVulnerabilities_Forbidden(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.VulnerabilitiesMock{}
 	mockHandler.RegisterForbiddenMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetVulnerabilities(ctx)
+	result, err := service.ListVulnerabilities(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -105,14 +105,14 @@ func TestGetVulnerabilities_Forbidden(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetVulnerabilitiesCSV_Success(t *testing.T) {
+func TestListVulnerabilitiesCSV_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.VulnerabilitiesMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.GetVulnerabilitiesCSV(ctx)
+	csvData, err := service.ListVulnerabilitiesCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -131,14 +131,14 @@ func TestGetVulnerabilitiesCSV_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetVulnerabilitiesCSV_Unauthorized(t *testing.T) {
+func TestListVulnerabilitiesCSV_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.VulnerabilitiesMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetVulnerabilitiesCSV(ctx)
+	result, err := service.ListVulnerabilitiesCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

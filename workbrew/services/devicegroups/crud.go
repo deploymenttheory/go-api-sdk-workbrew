@@ -8,9 +8,18 @@ import (
 
 type (
 	// DeviceGroupsServiceInterface defines the interface for device groups operations
+	//
+	// Workbrew API docs: https://console.workbrew.com/documentation/api
 	DeviceGroupsServiceInterface interface {
-		GetDeviceGroups(ctx context.Context) (*DeviceGroupsResponse, error)
-		GetDeviceGroupsCSV(ctx context.Context) ([]byte, error)
+		// ListDeviceGroups returns a list of Device Groups
+		//
+		// Returns device groups with their IDs, names, and assigned device serial numbers.
+		ListDeviceGroups(ctx context.Context) (*DeviceGroupsResponse, error)
+
+		// ListDeviceGroupsCSV returns a list of Device Groups in CSV format
+		//
+		// Returns device group data as CSV with columns: id, name, devices.
+		ListDeviceGroupsCSV(ctx context.Context) ([]byte, error)
 	}
 
 	// Service handles communication with the device groups
@@ -30,7 +39,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 	}
 }
 
-// GetDeviceGroups retrieves all device groups in JSON format
+// ListDeviceGroups retrieves all device groups in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/device_groups.json
 //
 // Example cURL:
@@ -40,7 +49,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: application/json" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/device_groups.json"
-func (s *Service) GetDeviceGroups(ctx context.Context) (*DeviceGroupsResponse, error) {
+func (s *Service) ListDeviceGroups(ctx context.Context) (*DeviceGroupsResponse, error) {
 	endpoint := EndpointDeviceGroupsJSON
 
 	headers := map[string]string{
@@ -59,7 +68,7 @@ func (s *Service) GetDeviceGroups(ctx context.Context) (*DeviceGroupsResponse, e
 	return &result, nil
 }
 
-// GetDeviceGroupsCSV retrieves all device groups in CSV format
+// ListDeviceGroupsCSV retrieves all device groups in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/device_groups.csv
 //
 // Example cURL:
@@ -69,7 +78,7 @@ func (s *Service) GetDeviceGroups(ctx context.Context) (*DeviceGroupsResponse, e
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: text/csv" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/device_groups.csv"
-func (s *Service) GetDeviceGroupsCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListDeviceGroupsCSV(ctx context.Context) ([]byte, error) {
 	endpoint := EndpointDeviceGroupsCSV
 
 	headers := map[string]string{

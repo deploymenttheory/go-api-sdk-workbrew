@@ -30,14 +30,14 @@ func setupMockClient(t *testing.T) (*Service, string) {
 	return NewService(httpClient), baseURL
 }
 
-func TestGetBrewTaps_Success(t *testing.T) {
+func TestListBrewTaps_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewTapsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetBrewTaps(ctx)
+	result, err := service.ListBrewTaps(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -70,14 +70,14 @@ func TestGetBrewTaps_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewTaps_Unauthorized(t *testing.T) {
+func TestListBrewTaps_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewTapsMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetBrewTaps(ctx)
+	result, err := service.ListBrewTaps(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -86,14 +86,14 @@ func TestGetBrewTaps_Unauthorized(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewTapsCSV_Success(t *testing.T) {
+func TestListBrewTapsCSV_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewTapsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.GetBrewTapsCSV(ctx)
+	csvData, err := service.ListBrewTapsCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -110,14 +110,14 @@ func TestGetBrewTapsCSV_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewTapsCSV_Unauthorized(t *testing.T) {
+func TestListBrewTapsCSV_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewTapsMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetBrewTapsCSV(ctx)
+	result, err := service.ListBrewTapsCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

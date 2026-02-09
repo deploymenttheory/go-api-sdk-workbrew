@@ -8,9 +8,18 @@ import (
 
 type (
 	// CasksServiceInterface defines the interface for casks operations
+	//
+	// Workbrew API docs: https://console.workbrew.com/documentation/api
 	CasksServiceInterface interface {
-		GetCasks(ctx context.Context) (*CasksResponse, error)
-		GetCasksCSV(ctx context.Context) ([]byte, error)
+		// ListCasks returns a list of Casks
+		//
+		// Returns installed Homebrew casks with their names, assigned devices, outdated status, deprecation info, and versions.
+		ListCasks(ctx context.Context) (*CasksResponse, error)
+
+		// ListCasksCSV returns a list of Casks in CSV format
+		//
+		// Returns cask data as CSV with columns: name, devices, outdated, deprecated, homebrew_cask_version.
+		ListCasksCSV(ctx context.Context) ([]byte, error)
 	}
 
 	// Service handles communication with the casks
@@ -30,7 +39,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 	}
 }
 
-// GetCasks retrieves all casks in JSON format
+// ListCasks retrieves all casks in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/casks.json
 //
 // Example cURL:
@@ -40,7 +49,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: application/json" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/casks.json"
-func (s *Service) GetCasks(ctx context.Context) (*CasksResponse, error) {
+func (s *Service) ListCasks(ctx context.Context) (*CasksResponse, error) {
 	endpoint := EndpointCasksJSON
 
 	headers := map[string]string{
@@ -59,7 +68,7 @@ func (s *Service) GetCasks(ctx context.Context) (*CasksResponse, error) {
 	return &result, nil
 }
 
-// GetCasksCSV retrieves all casks in CSV format
+// ListCasksCSV retrieves all casks in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/casks.csv
 //
 // Example cURL:
@@ -69,7 +78,7 @@ func (s *Service) GetCasks(ctx context.Context) (*CasksResponse, error) {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: text/csv" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/casks.csv"
-func (s *Service) GetCasksCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListCasksCSV(ctx context.Context) ([]byte, error) {
 	endpoint := EndpointCasksCSV
 
 	headers := map[string]string{

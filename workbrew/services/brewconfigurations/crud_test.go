@@ -30,14 +30,14 @@ func setupMockClient(t *testing.T) (*Service, string) {
 	return NewService(httpClient), baseURL
 }
 
-func TestGetBrewConfigurations_Success(t *testing.T) {
+func TestListBrewConfigurations_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewConfigurationsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetBrewConfigurations(ctx)
+	result, err := service.ListBrewConfigurations(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -54,28 +54,28 @@ func TestGetBrewConfigurations_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetBrewConfigurations_Unauthorized(t *testing.T) {
+func TestListBrewConfigurations_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewConfigurationsMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetBrewConfigurations(ctx)
+	result, err := service.ListBrewConfigurations(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "401")
 }
 
-func TestGetBrewConfigurationsCSV_Success(t *testing.T) {
+func TestListBrewConfigurationsCSV_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.BrewConfigurationsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.GetBrewConfigurationsCSV(ctx)
+	csvData, err := service.ListBrewConfigurationsCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)

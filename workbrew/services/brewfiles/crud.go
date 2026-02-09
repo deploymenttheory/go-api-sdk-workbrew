@@ -9,18 +9,49 @@ import (
 
 type (
 	// BrewfilesServiceInterface defines the interface for brewfiles operations
+	//
+	// Workbrew API docs: https://console.workbrew.com/documentation/api
 	BrewfilesServiceInterface interface {
-		GetBrewfiles(ctx context.Context) (*BrewfilesResponse, error)
-		GetBrewfilesCSV(ctx context.Context) ([]byte, error)
+		// ListBrewfiles returns a list of brewfiles with their status and device assignments
+		//
+		// Returns brewfiles with last updated user, start/finish timestamps, assigned devices, and run count
+		ListBrewfiles(ctx context.Context) (*BrewfilesResponse, error)
+
+		// ListBrewfilesCSV returns a list of brewfiles in CSV format
+		//
+		// Returns the same brewfiles data as ListBrewfiles but formatted as CSV
+		ListBrewfilesCSV(ctx context.Context) ([]byte, error)
+
+		// CreateBrewfile creates a new brewfile with specified label, content, and device/group assignment
+		//
+		// Requires label and content fields. Can assign to specific devices via device_serial_numbers or to a device group via device_group_id
 		CreateBrewfile(ctx context.Context, request *CreateBrewfileRequest) (*BrewfileMessageResponse, error)
+
+		// UpdateBrewfile updates an existing brewfile's content and device assignments
+		//
+		// Updates the brewfile identified by label. Can update content, device_serial_numbers, or device_group_id
 		UpdateBrewfile(ctx context.Context, label string, request *UpdateBrewfileRequest) (*BrewfileMessageResponse, error)
+
+		// DeleteBrewfile deletes a brewfile by its label
+		//
+		// Permanently removes the brewfile identified by the specified label
 		DeleteBrewfile(ctx context.Context, label string) (*BrewfileMessageResponse, error)
-		GetBrewfileRuns(ctx context.Context, label string) (*BrewfileRunsResponse, error)
-		GetBrewfileRunsCSV(ctx context.Context, label string) ([]byte, error)
+
+		// ListBrewfileRuns returns a list of brewfile runs for a specific brewfile
+		//
+		// Returns run history including label, device, timestamps, success status, and output for the specified brewfile label
+		ListBrewfileRuns(ctx context.Context, label string) (*BrewfileRunsResponse, error)
+
+		// ListBrewfileRunsCSV returns a list of brewfile runs in CSV format
+		//
+		// Returns the same run data as ListBrewfileRuns but formatted as CSV
+		ListBrewfileRunsCSV(ctx context.Context, label string) ([]byte, error)
 	}
 
 	// Service handles communication with the brewfiles
 	// related methods of the Workbrew API.
+	//
+	// Workbrew API docs: https://console.workbrew.com/documentation/api
 	Service struct {
 		client interfaces.HTTPClient
 	}
@@ -36,7 +67,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 	}
 }
 
-// GetBrewfiles retrieves all brewfiles in JSON format
+// ListBrewfiles retrieves all brewfiles in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brewfiles.json
 //
 // Example cURL:
@@ -46,7 +77,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: application/json" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/brewfiles.json"
-func (s *Service) GetBrewfiles(ctx context.Context) (*BrewfilesResponse, error) {
+func (s *Service) ListBrewfiles(ctx context.Context) (*BrewfilesResponse, error) {
 	endpoint := EndpointBrewfilesJSON
 
 	headers := map[string]string{
@@ -65,7 +96,7 @@ func (s *Service) GetBrewfiles(ctx context.Context) (*BrewfilesResponse, error) 
 	return &result, nil
 }
 
-// GetBrewfilesCSV retrieves all brewfiles in CSV format
+// ListBrewfilesCSV retrieves all brewfiles in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brewfiles.csv
 //
 // Example cURL:
@@ -75,7 +106,7 @@ func (s *Service) GetBrewfiles(ctx context.Context) (*BrewfilesResponse, error) 
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: text/csv" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/brewfiles.csv"
-func (s *Service) GetBrewfilesCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListBrewfilesCSV(ctx context.Context) ([]byte, error) {
 	endpoint := EndpointBrewfilesCSV
 
 	headers := map[string]string{
@@ -198,7 +229,7 @@ func (s *Service) DeleteBrewfile(ctx context.Context, label string) (*BrewfileMe
 	return &result, nil
 }
 
-// GetBrewfileRuns retrieves all runs for a specific brewfile in JSON format
+// ListBrewfileRuns retrieves all runs for a specific brewfile in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brewfiles/{label}/runs.json
 //
 // Example cURL:
@@ -208,7 +239,7 @@ func (s *Service) DeleteBrewfile(ctx context.Context, label string) (*BrewfileMe
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: application/json" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/brewfiles/my-brewfile/runs.json"
-func (s *Service) GetBrewfileRuns(ctx context.Context, label string) (*BrewfileRunsResponse, error) {
+func (s *Service) ListBrewfileRuns(ctx context.Context, label string) (*BrewfileRunsResponse, error) {
 	if label == "" {
 		return nil, fmt.Errorf("brewfile label is required")
 	}
@@ -231,7 +262,7 @@ func (s *Service) GetBrewfileRuns(ctx context.Context, label string) (*BrewfileR
 	return &result, nil
 }
 
-// GetBrewfileRunsCSV retrieves all runs for a specific brewfile in CSV format
+// ListBrewfileRunsCSV retrieves all runs for a specific brewfile in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brewfiles/{label}/runs.csv
 //
 // Example cURL:
@@ -241,7 +272,7 @@ func (s *Service) GetBrewfileRuns(ctx context.Context, label string) (*BrewfileR
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: text/csv" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/brewfiles/my-brewfile/runs.csv"
-func (s *Service) GetBrewfileRunsCSV(ctx context.Context, label string) ([]byte, error) {
+func (s *Service) ListBrewfileRunsCSV(ctx context.Context, label string) ([]byte, error) {
 	if label == "" {
 		return nil, fmt.Errorf("brewfile label is required")
 	}

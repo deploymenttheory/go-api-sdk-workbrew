@@ -1,0 +1,58 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"os"
+
+	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/client"
+	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/analytics"
+	"go.uber.org/zap"
+)
+
+func main() {
+	// Retrieve API key and workspace from environment variables
+	apiKey := os.Getenv("WORKBREW_API_KEY")
+	workspace := os.Getenv("WORKBREW_WORKSPACE")
+
+	if apiKey == "" || workspace == "" {
+		log.Fatal("WORKBREW_API_KEY and WORKBREW_WORKSPACE environment variables must be set")
+	}
+
+	// Create logger
+	logger, err := zap.NewProduction()
+	if err != nil {
+		log.Fatalf("Failed to create logger: %v", err)
+	}
+	defer logger.Sync()
+
+	// Create HTTP client
+	httpClient, err := client.NewClient(apiKey, workspace,
+		client.WithLogger(logger),
+		client.WithBaseURL("https://console.workbrew.com"),
+	)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}
+
+	// Create analytics service
+	analyticsService := analytics.NewService(httpClient)
+
+	// List analytics
+	ctx := context.Background()
+	analyticsData, err := analyticsService.ListAnalytics(ctx)
+	if err != nil {
+		log.Fatalf("Failed to list analytics: %v", err)
+	}
+
+	// Print results
+	fmt.Printf("Retrieved %d analytics records\n", len(*analyticsData))
+	for i, analytic := range *analyticsData {
+		fmt.Printf("\nAnalytic %d:\n", i+1)
+		fmt.Printf("  Device: %s\n", analytic.Device)
+		fmt.Printf("  Command: %s\n", analytic.Command)
+		fmt.Printf("  Last Run: %s\n", analytic.LastRun)
+		fmt.Printf("  Count: %d\n", analytic.Count)
+	}
+}

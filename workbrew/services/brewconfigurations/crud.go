@@ -8,12 +8,18 @@ import (
 
 type (
 	// BrewConfigurationsServiceInterface defines the interface for brew configurations operations
+	//
+	// Workbrew API docs: https://console.workbrew.com/documentation/api
 	BrewConfigurationsServiceInterface interface {
-		// GetBrewConfigurations retrieves all brew configurations in JSON format
-		GetBrewConfigurations(ctx context.Context) (*BrewConfigurationsResponse, error)
+		// ListBrewConfigurations returns a list of Brew Configurations
+		//
+		// Returns Homebrew environment variable configurations with their keys, values, last updated user, and assigned device groups.
+		ListBrewConfigurations(ctx context.Context) (*BrewConfigurationsResponse, error)
 
-		// GetBrewConfigurationsCSV retrieves all brew configurations in CSV format
-		GetBrewConfigurationsCSV(ctx context.Context) ([]byte, error)
+		// ListBrewConfigurationsCSV returns a list of Brew Configurations in CSV format
+		//
+		// Returns brew configuration data as CSV with columns: key, value, last_updated_by_user, device_group.
+		ListBrewConfigurationsCSV(ctx context.Context) ([]byte, error)
 	}
 
 	// Service handles communication with the brew configurations
@@ -33,7 +39,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 	}
 }
 
-// GetBrewConfigurations retrieves all brew configurations in JSON format
+// ListBrewConfigurations retrieves all brew configurations in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brew_configurations.json
 //
 // Example cURL:
@@ -43,7 +49,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: application/json" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/brew_configurations.json"
-func (s *Service) GetBrewConfigurations(ctx context.Context) (*BrewConfigurationsResponse, error) {
+func (s *Service) ListBrewConfigurations(ctx context.Context) (*BrewConfigurationsResponse, error) {
 	endpoint := EndpointBrewConfigurationsJSON
 
 	headers := map[string]string{
@@ -62,7 +68,7 @@ func (s *Service) GetBrewConfigurations(ctx context.Context) (*BrewConfiguration
 	return &result, nil
 }
 
-// GetBrewConfigurationsCSV retrieves all brew configurations in CSV format
+// ListBrewConfigurationsCSV retrieves all brew configurations in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brew_configurations.csv
 //
 // Example cURL:
@@ -72,7 +78,7 @@ func (s *Service) GetBrewConfigurations(ctx context.Context) (*BrewConfiguration
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: text/csv" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/brew_configurations.csv"
-func (s *Service) GetBrewConfigurationsCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListBrewConfigurationsCSV(ctx context.Context) ([]byte, error) {
 	endpoint := EndpointBrewConfigurationsCSV
 
 	headers := map[string]string{

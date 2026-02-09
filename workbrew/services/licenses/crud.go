@@ -8,9 +8,18 @@ import (
 
 type (
 	// LicensesServiceInterface defines the interface for licenses operations
+	//
+	// Workbrew API docs: https://console.workbrew.com/documentation/api
 	LicensesServiceInterface interface {
-		GetLicenses(ctx context.Context) (*LicensesResponse, error)
-		GetLicensesCSV(ctx context.Context) ([]byte, error)
+		// ListLicenses returns a list of Licenses
+		//
+		// Returns software licenses found across installed formulae, with license names and counts of affected devices and formulae.
+		ListLicenses(ctx context.Context) (*LicensesResponse, error)
+
+		// ListLicensesCSV returns a list of Licenses in CSV format
+		//
+		// Returns license data as CSV with columns: name, device_count, formula_count.
+		ListLicensesCSV(ctx context.Context) ([]byte, error)
 	}
 
 	// Service handles communication with the licenses
@@ -30,7 +39,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 	}
 }
 
-// GetLicenses retrieves all licenses in JSON format
+// ListLicenses retrieves all licenses in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/licenses.json
 //
 // Example cURL:
@@ -40,7 +49,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: application/json" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/licenses.json"
-func (s *Service) GetLicenses(ctx context.Context) (*LicensesResponse, error) {
+func (s *Service) ListLicenses(ctx context.Context) (*LicensesResponse, error) {
 	endpoint := EndpointLicensesJSON
 
 	headers := map[string]string{
@@ -59,7 +68,7 @@ func (s *Service) GetLicenses(ctx context.Context) (*LicensesResponse, error) {
 	return &result, nil
 }
 
-// GetLicensesCSV retrieves all licenses in CSV format
+// ListLicensesCSV retrieves all licenses in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/licenses.csv
 //
 // Example cURL:
@@ -69,7 +78,7 @@ func (s *Service) GetLicenses(ctx context.Context) (*LicensesResponse, error) {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: text/csv" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/licenses.csv"
-func (s *Service) GetLicensesCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListLicensesCSV(ctx context.Context) ([]byte, error) {
 	endpoint := EndpointLicensesCSV
 
 	headers := map[string]string{

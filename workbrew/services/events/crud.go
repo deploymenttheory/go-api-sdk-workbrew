@@ -8,9 +8,20 @@ import (
 
 type (
 	// EventsServiceInterface defines the interface for events operations
+	//
+	// Workbrew API docs: https://console.workbrew.com/documentation/api
 	EventsServiceInterface interface {
-		GetEvents(ctx context.Context, opts *RequestQueryOptions) (*EventsResponse, error)
-		GetEventsCSV(ctx context.Context, opts *RequestQueryOptions) ([]byte, error)
+		// ListEvents returns a list of audit log events
+		//
+		// Returns audit log events with IDs, event types, timestamps, actor information, and target details.
+		// Supports filtering by actor type (user, system, or all) via query options.
+		ListEvents(ctx context.Context, opts *RequestQueryOptions) (*EventsResponse, error)
+
+		// ListEventsCSV returns audit log events as CSV
+		//
+		// Returns audit log event data as CSV with columns: id, event_type, occurred_at, actor_id, actor_type, target_id, target_type, target_identifier.
+		// Supports filtering by actor type and optional download parameter via query options.
+		ListEventsCSV(ctx context.Context, opts *RequestQueryOptions) ([]byte, error)
 	}
 
 	// Service handles communication with the events
@@ -30,7 +41,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 	}
 }
 
-// GetEvents retrieves all events in JSON format
+// ListEvents retrieves all events in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/events.json
 //
 // Parameters:
@@ -43,7 +54,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: application/json" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/events.json?filter=user"
-func (s *Service) GetEvents(ctx context.Context, opts *RequestQueryOptions) (*EventsResponse, error) {
+func (s *Service) ListEvents(ctx context.Context, opts *RequestQueryOptions) (*EventsResponse, error) {
 	endpoint := EndpointEventsJSON
 
 	headers := map[string]string{
@@ -51,12 +62,10 @@ func (s *Service) GetEvents(ctx context.Context, opts *RequestQueryOptions) (*Ev
 		"Content-Type": "application/json",
 	}
 
-	// Nil-safe options handling
 	if opts == nil {
 		opts = &RequestQueryOptions{}
 	}
 
-	// Build query parameters
 	queryParams := s.client.QueryBuilder().
 		AddIfNotEmpty("filter", opts.Filter).
 		Build()
@@ -70,7 +79,7 @@ func (s *Service) GetEvents(ctx context.Context, opts *RequestQueryOptions) (*Ev
 	return &result, nil
 }
 
-// GetEventsCSV retrieves all events in CSV format
+// ListEventsCSV retrieves all events in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/events.csv
 //
 // Parameters:
@@ -83,19 +92,17 @@ func (s *Service) GetEvents(ctx context.Context, opts *RequestQueryOptions) (*Ev
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: text/csv" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/events.csv?filter=user&download=1"
-func (s *Service) GetEventsCSV(ctx context.Context, opts *RequestQueryOptions) ([]byte, error) {
+func (s *Service) ListEventsCSV(ctx context.Context, opts *RequestQueryOptions) ([]byte, error) {
 	endpoint := EndpointEventsCSV
 
 	headers := map[string]string{
 		"Accept": "text/csv",
 	}
 
-	// Nil-safe options handling
 	if opts == nil {
 		opts = &RequestQueryOptions{}
 	}
 
-	// Build query parameters
 	qb := s.client.QueryBuilder().AddIfNotEmpty("filter", opts.Filter)
 	if opts.Download {
 		qb.AddString("download", "1")

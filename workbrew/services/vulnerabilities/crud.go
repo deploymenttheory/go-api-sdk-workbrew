@@ -8,9 +8,20 @@ import (
 
 type (
 	// VulnerabilitiesServiceInterface defines the interface for vulnerabilities operations
+	//
+	// Workbrew API docs: https://console.workbrew.com/documentation/api
 	VulnerabilitiesServiceInterface interface {
-		GetVulnerabilities(ctx context.Context) (*VulnerabilitiesResponse, error)
-		GetVulnerabilitiesCSV(ctx context.Context) ([]byte, error)
+		// ListVulnerabilities returns a list of Vulnerabilities
+		//
+		// Returns security vulnerabilities affecting installed formulae, including CVE IDs with CVSS scores, 
+		// affected formula names, outdated devices, support status, and Homebrew core versions.
+		// May return 403 Forbidden on Free tier plans.
+		ListVulnerabilities(ctx context.Context) (*VulnerabilitiesResponse, error)
+
+		// ListVulnerabilitiesCSV returns a list of Vulnerabilities in CSV format
+		//
+		// Returns vulnerability data as CSV with columns: vulnerabilities, formula, outdated_devices, supported, homebrew_core_version.
+		ListVulnerabilitiesCSV(ctx context.Context) ([]byte, error)
 	}
 
 	// Service handles communication with the vulnerabilities
@@ -30,7 +41,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 	}
 }
 
-// GetVulnerabilities retrieves all vulnerabilities in JSON format
+// ListVulnerabilities retrieves all vulnerabilities in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/vulnerabilities.json
 //
 // Note: This endpoint may return 403 on Free tier plans
@@ -42,7 +53,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: application/json" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/vulnerabilities.json"
-func (s *Service) GetVulnerabilities(ctx context.Context) (*VulnerabilitiesResponse, error) {
+func (s *Service) ListVulnerabilities(ctx context.Context) (*VulnerabilitiesResponse, error) {
 	endpoint := EndpointVulnerabilitiesJSON
 
 	headers := map[string]string{
@@ -61,7 +72,7 @@ func (s *Service) GetVulnerabilities(ctx context.Context) (*VulnerabilitiesRespo
 	return &result, nil
 }
 
-// GetVulnerabilitiesCSV retrieves all vulnerabilities in CSV format
+// ListVulnerabilitiesCSV retrieves all vulnerabilities in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/vulnerabilities.csv
 //
 // Note: This endpoint may return 403 on Free tier plans
@@ -73,7 +84,7 @@ func (s *Service) GetVulnerabilities(ctx context.Context) (*VulnerabilitiesRespo
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: text/csv" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/vulnerabilities.csv"
-func (s *Service) GetVulnerabilitiesCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListVulnerabilitiesCSV(ctx context.Context) ([]byte, error) {
 	endpoint := EndpointVulnerabilitiesCSV
 
 	headers := map[string]string{

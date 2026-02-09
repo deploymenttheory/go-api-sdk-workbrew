@@ -8,16 +8,24 @@ import (
 
 type (
 	// AnalyticsServiceInterface defines the interface for analytics operations
+	//
+	// Workbrew API docs: https://console.workbrew.com/documentation/api
 	AnalyticsServiceInterface interface {
-		// GetAnalytics retrieves all analytics in JSON format
-		GetAnalytics(ctx context.Context) (*AnalyticsResponse, error)
+		// ListAnalytics returns a list of analytics data showing command usage statistics per device
+		//
+		// Returns analytics records with device, command, last run timestamp, and count information
+		ListAnalytics(ctx context.Context) (*AnalyticsResponse, error)
 
-		// GetAnalyticsCSV retrieves all analytics in CSV format
-		GetAnalyticsCSV(ctx context.Context) ([]byte, error)
+		// ListAnalyticsCSV returns a list of analytics data in CSV format
+		//
+		// Returns the same analytics data as ListAnalytics but formatted as CSV
+		ListAnalyticsCSV(ctx context.Context) ([]byte, error)
 	}
 
 	// Service handles communication with the analytics
 	// related methods of the Workbrew API.
+	//
+	// Workbrew API docs: https://console.workbrew.com/documentation/api
 	Service struct {
 		client interfaces.HTTPClient
 	}
@@ -33,7 +41,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 	}
 }
 
-// GetAnalytics retrieves all analytics in JSON format
+// ListAnalytics retrieves all analytics in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/analytics.json
 //
 // Example cURL:
@@ -43,7 +51,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: application/json" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/analytics.json"
-func (s *Service) GetAnalytics(ctx context.Context) (*AnalyticsResponse, error) {
+func (s *Service) ListAnalytics(ctx context.Context) (*AnalyticsResponse, error) {
 	endpoint := EndpointAnalyticsJSON
 
 	headers := map[string]string{
@@ -62,7 +70,7 @@ func (s *Service) GetAnalytics(ctx context.Context) (*AnalyticsResponse, error) 
 	return &result, nil
 }
 
-// GetAnalyticsCSV retrieves all analytics in CSV format
+// ListAnalyticsCSV retrieves all analytics in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/analytics.csv
 //
 // Example cURL:
@@ -72,7 +80,7 @@ func (s *Service) GetAnalytics(ctx context.Context) (*AnalyticsResponse, error) 
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: text/csv" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/analytics.csv"
-func (s *Service) GetAnalyticsCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListAnalyticsCSV(ctx context.Context) ([]byte, error) {
 	endpoint := EndpointAnalyticsCSV
 
 	headers := map[string]string{

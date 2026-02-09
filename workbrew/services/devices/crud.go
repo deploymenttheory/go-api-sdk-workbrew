@@ -8,24 +8,24 @@ import (
 
 type (
 	// DevicesServiceInterface defines the interface for devices operations
+	//
+	// Workbrew API docs: https://console.workbrew.com/documentation/api
 	DevicesServiceInterface interface {
-		// GetDevices retrieves all devices in JSON format
+		// ListDevices returns a list of devices
 		//
-		// Workbrew API docs:
-		// https://console.workbrew.com/api-docs
-		GetDevices(ctx context.Context) (*DevicesResponse, error)
+		// Returns devices with serial numbers, group assignments, MDM names, last seen timestamps, device types, 
+		// OS versions, Homebrew/Workbrew versions, and installed package counts.
+		ListDevices(ctx context.Context) (*DevicesResponse, error)
 
-		// GetDevicesCSV retrieves all devices in CSV format
+		// ListDevicesCSV returns a list of devices in CSV format
 		//
-		// Workbrew API docs:
-		// https://console.workbrew.com/api-docs
-		GetDevicesCSV(ctx context.Context) ([]byte, error)
+		// Returns device data as CSV with columns: serial_number, groups, mdm_user_or_device_name, last_seen_at, 
+		// command_last_run_at, device_type, os_version, homebrew_prefix, homebrew_version, workbrew_version, formulae_count, casks_count.
+		ListDevicesCSV(ctx context.Context) ([]byte, error)
 	}
 
 	// Service handles communication with the devices
 	// related methods of the Workbrew API.
-	//
-	// Workbrew API docs: https://console.workbrew.com/api-docs
 	Service struct {
 		client interfaces.HTTPClient
 	}
@@ -41,7 +41,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 	}
 }
 
-// GetDevices retrieves all devices in JSON format
+// ListDevices retrieves all devices in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/devices.json
 //
 // Example cURL:
@@ -51,7 +51,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: application/json" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/devices.json"
-func (s *Service) GetDevices(ctx context.Context) (*DevicesResponse, error) {
+func (s *Service) ListDevices(ctx context.Context) (*DevicesResponse, error) {
 	endpoint := EndpointDevicesJSON
 
 	headers := map[string]string{
@@ -70,7 +70,7 @@ func (s *Service) GetDevices(ctx context.Context) (*DevicesResponse, error) {
 	return &result, nil
 }
 
-// GetDevicesCSV retrieves all devices in CSV format
+// ListDevicesCSV retrieves all devices in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/devices.csv
 //
 // Example cURL:
@@ -80,7 +80,7 @@ func (s *Service) GetDevices(ctx context.Context) (*DevicesResponse, error) {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: text/csv" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/devices.csv"
-func (s *Service) GetDevicesCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListDevicesCSV(ctx context.Context) ([]byte, error) {
 	endpoint := EndpointDevicesCSV
 
 	headers := map[string]string{

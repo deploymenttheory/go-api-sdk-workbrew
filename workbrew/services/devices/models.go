@@ -7,18 +7,18 @@ import (
 // Device represents a device in the workspace
 // Matches the schema from swagger specification
 type Device struct {
-	SerialNumber        string    `json:"serial_number"`
-	Groups              []string  `json:"groups"`
-	MDMUserOrDeviceName *string   `json:"mdm_user_or_device_name"` // nullable
+	SerialNumber        string      `json:"serial_number"`
+	Groups              []string    `json:"groups"`
+	MDMUserOrDeviceName *string     `json:"mdm_user_or_device_name"` // nullable
 	LastSeenAt          TimeOrNever `json:"last_seen_at"`            // date-time or "Never"
 	CommandLastRunAt    TimeOrNever `json:"command_last_run_at"`     // date-time or "Never"
-	DeviceType          string    `json:"device_type"`
-	OSVersion           string    `json:"os_version"`
-	HomebrewPrefix      string    `json:"homebrew_prefix"`
-	HomebrewVersion     string    `json:"homebrew_version"`
-	WorkbrewVersion     string    `json:"workbrew_version"`
-	FormulaeCount       int       `json:"formulae_count"`
-	CasksCount          int       `json:"casks_count"`
+	DeviceType          string      `json:"device_type"`
+	OSVersion           string      `json:"os_version"`
+	HomebrewPrefix      string      `json:"homebrew_prefix"`
+	HomebrewVersion     string      `json:"homebrew_version"`
+	WorkbrewVersion     string      `json:"workbrew_version"`
+	FormulaeCount       int         `json:"formulae_count"`
+	CasksCount          int         `json:"casks_count"`
 }
 
 // DevicesResponse represents the response from the devices.json endpoint
@@ -34,19 +34,16 @@ type TimeOrNever struct {
 func (t *TimeOrNever) UnmarshalJSON(data []byte) error {
 	str := string(data)
 
-	// Remove quotes
 	if len(str) >= 2 && str[0] == '"' && str[len(str)-1] == '"' {
 		str = str[1 : len(str)-1]
 	}
 
-	// Check if it's "Never"
 	if str == "Never" {
 		t.Never = true
 		t.Time = nil
 		return nil
 	}
 
-	// Parse as time
 	parsedTime, err := time.Parse(time.RFC3339, str)
 	if err != nil {
 		return err
@@ -84,12 +81,10 @@ type TimeOrStatus struct {
 func (t *TimeOrStatus) UnmarshalJSON(data []byte) error {
 	str := string(data)
 
-	// Remove quotes
 	if len(str) >= 2 && str[0] == '"' && str[len(str)-1] == '"' {
 		str = str[1 : len(str)-1]
 	}
 
-	// Check if it's a status string
 	switch str {
 	case "Never", "Not Started", "Not Finished":
 		t.Status = str
@@ -97,7 +92,6 @@ func (t *TimeOrStatus) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	// Parse as time
 	parsedTime, err := time.Parse(time.RFC3339, str)
 	if err != nil {
 		return err

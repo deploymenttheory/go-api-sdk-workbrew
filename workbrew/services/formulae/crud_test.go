@@ -30,14 +30,14 @@ func setupMockClient(t *testing.T) (*Service, string) {
 	return NewService(httpClient), baseURL
 }
 
-func TestGetFormulae_Success(t *testing.T) {
+func TestListFormulae_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.FormulaeMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetFormulae(ctx)
+	result, err := service.ListFormulae(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -76,14 +76,14 @@ func TestGetFormulae_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetFormulae_Unauthorized(t *testing.T) {
+func TestListFormulae_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.FormulaeMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetFormulae(ctx)
+	result, err := service.ListFormulae(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -92,14 +92,14 @@ func TestGetFormulae_Unauthorized(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetFormulaeCSV_Success(t *testing.T) {
+func TestListFormulaeCSV_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.FormulaeMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.GetFormulaeCSV(ctx)
+	csvData, err := service.ListFormulaeCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -117,14 +117,14 @@ func TestGetFormulaeCSV_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetFormulaeCSV_Unauthorized(t *testing.T) {
+func TestListFormulaeCSV_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.FormulaeMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetFormulaeCSV(ctx)
+	result, err := service.ListFormulaeCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

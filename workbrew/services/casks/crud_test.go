@@ -30,14 +30,14 @@ func setupMockClient(t *testing.T) (*Service, string) {
 	return NewService(httpClient), baseURL
 }
 
-func TestGetCasks_Success(t *testing.T) {
+func TestListCasks_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.CasksMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetCasks(ctx)
+	result, err := service.ListCasks(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -73,14 +73,14 @@ func TestGetCasks_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetCasks_Unauthorized(t *testing.T) {
+func TestListCasks_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.CasksMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetCasks(ctx)
+	result, err := service.ListCasks(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -89,14 +89,14 @@ func TestGetCasks_Unauthorized(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetCasksCSV_Success(t *testing.T) {
+func TestListCasksCSV_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.CasksMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.GetCasksCSV(ctx)
+	csvData, err := service.ListCasksCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -112,14 +112,14 @@ func TestGetCasksCSV_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetCasksCSV_Unauthorized(t *testing.T) {
+func TestListCasksCSV_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.CasksMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetCasksCSV(ctx)
+	result, err := service.ListCasksCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

@@ -39,14 +39,14 @@ func setupMockClient(t *testing.T) (*Service, string) {
 	return NewService(httpClient), baseURL
 }
 
-func TestGetAnalytics_Success(t *testing.T) {
+func TestListAnalytics_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.AnalyticsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetAnalytics(ctx)
+	result, err := service.ListAnalytics(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -65,14 +65,14 @@ func TestGetAnalytics_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetAnalytics_VerifyAllFields(t *testing.T) {
+func TestListAnalytics_VerifyAllFields(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.AnalyticsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetAnalytics(ctx)
+	result, err := service.ListAnalytics(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -86,14 +86,14 @@ func TestGetAnalytics_VerifyAllFields(t *testing.T) {
 	}
 }
 
-func TestGetAnalytics_VerifyDevices(t *testing.T) {
+func TestListAnalytics_VerifyDevices(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.AnalyticsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetAnalytics(ctx)
+	result, err := service.ListAnalytics(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -108,14 +108,14 @@ func TestGetAnalytics_VerifyDevices(t *testing.T) {
 	assert.Contains(t, deviceMap, "1234567890", "Should have analytics for device 1234567890")
 }
 
-func TestGetAnalytics_Unauthorized(t *testing.T) {
+func TestListAnalytics_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.AnalyticsMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetAnalytics(ctx)
+	result, err := service.ListAnalytics(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -124,14 +124,14 @@ func TestGetAnalytics_Unauthorized(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetAnalyticsCSV_Success(t *testing.T) {
+func TestListAnalyticsCSV_Success(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.AnalyticsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.GetAnalyticsCSV(ctx)
+	csvData, err := service.ListAnalyticsCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -146,14 +146,14 @@ func TestGetAnalyticsCSV_Success(t *testing.T) {
 	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }
 
-func TestGetAnalyticsCSV_VerifyFormat(t *testing.T) {
+func TestListAnalyticsCSV_VerifyFormat(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.AnalyticsMock{}
 	mockHandler.RegisterMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.GetAnalyticsCSV(ctx)
+	csvData, err := service.ListAnalyticsCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -167,14 +167,14 @@ func TestGetAnalyticsCSV_VerifyFormat(t *testing.T) {
 	assert.Contains(t, csvString, "1234567890,brew upgrade git,2024-05-10T09:30:00Z,3")
 }
 
-func TestGetAnalyticsCSV_Unauthorized(t *testing.T) {
+func TestListAnalyticsCSV_Unauthorized(t *testing.T) {
 	service, baseURL := setupMockClient(t)
 	mockHandler := &mocks.AnalyticsMock{}
 	mockHandler.RegisterErrorMocks(baseURL)
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.GetAnalyticsCSV(ctx)
+	result, err := service.ListAnalyticsCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -192,8 +192,8 @@ func TestAnalytics_HTTPMockCallCounts(t *testing.T) {
 	ctx := context.Background()
 
 	// Make multiple calls
-	_, err1 := service.GetAnalytics(ctx)
-	_, err2 := service.GetAnalyticsCSV(ctx)
+	_, err1 := service.ListAnalytics(ctx)
+	_, err2 := service.ListAnalyticsCSV(ctx)
 
 	require.NoError(t, err1)
 	require.NoError(t, err2)
@@ -211,12 +211,12 @@ func TestAnalytics_MultipleSequentialCalls(t *testing.T) {
 	ctx := context.Background()
 
 	// First call
-	result1, err1 := service.GetAnalytics(ctx)
+	result1, err1 := service.ListAnalytics(ctx)
 	require.NoError(t, err1)
 	require.NotNil(t, result1)
 
 	// Second call should return same data
-	result2, err2 := service.GetAnalytics(ctx)
+	result2, err2 := service.ListAnalytics(ctx)
 	require.NoError(t, err2)
 	require.NotNil(t, result2)
 
