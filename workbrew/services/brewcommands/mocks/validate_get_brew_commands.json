@@ -1,0 +1,13 @@
+[
+  {
+    "command": "brew outdated",
+    "label": "outdated",
+    "last_updated_by_user": "mikemcquaid",
+    "started_at": "2023-11-01T12:34:56.000Z",
+    "finished_at": "2023-11-01T21:43:12.000Z",
+    "devices": [
+      "TC6R2DHVHG"
+    ],
+    "run_count": 2
+  }
+]

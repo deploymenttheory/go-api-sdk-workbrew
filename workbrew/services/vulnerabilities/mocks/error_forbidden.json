@@ -1,0 +1,6 @@
+{
+  "message": "An error occurred when trying to view vulnerabilities",
+  "errors": [
+    "Vulnerabilities cannot be viewed in detail or mitigated on a Workbrew Free subscription."
+  ]
+}

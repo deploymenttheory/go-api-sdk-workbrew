@@ -1,0 +1,6 @@
+{
+  "message": "Authentication required or invalid API key",
+  "errors": [
+    "Invalid or missing authorization token"
+  ]
+}

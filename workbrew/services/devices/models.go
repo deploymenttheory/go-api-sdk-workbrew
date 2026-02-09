@@ -72,3 +72,80 @@ func (t TimeOrNever) String() string {
 	}
 	return t.Time.Format(time.RFC3339)
 }
+
+// TimeOrStatus handles the "oneOf" type from swagger: date-time or status strings
+// Supports: "Never", "Not Started", "Not Finished", and RFC3339 date-time
+type TimeOrStatus struct {
+	Time   *time.Time
+	Status string // "Never", "Not Started", "Not Finished", or empty if Time is set
+}
+
+// UnmarshalJSON implements custom unmarshaling for TimeOrStatus
+func (t *TimeOrStatus) UnmarshalJSON(data []byte) error {
+	str := string(data)
+
+	// Remove quotes
+	if len(str) >= 2 && str[0] == '"' && str[len(str)-1] == '"' {
+		str = str[1 : len(str)-1]
+	}
+
+	// Check if it's a status string
+	switch str {
+	case "Never", "Not Started", "Not Finished":
+		t.Status = str
+		t.Time = nil
+		return nil
+	}
+
+	// Parse as time
+	parsedTime, err := time.Parse(time.RFC3339, str)
+	if err != nil {
+		return err
+	}
+
+	t.Time = &parsedTime
+	t.Status = ""
+	return nil
+}
+
+// MarshalJSON implements custom marshaling for TimeOrStatus
+func (t TimeOrStatus) MarshalJSON() ([]byte, error) {
+	if t.Status != "" {
+		return []byte(`"` + t.Status + `"`), nil
+	}
+	if t.Time == nil {
+		return []byte(`"Never"`), nil
+	}
+	return []byte(`"` + t.Time.Format(time.RFC3339) + `"`), nil
+}
+
+// String returns a string representation of TimeOrStatus
+func (t TimeOrStatus) String() string {
+	if t.Status != "" {
+		return t.Status
+	}
+	if t.Time == nil {
+		return "Never"
+	}
+	return t.Time.Format(time.RFC3339)
+}
+
+// IsNever returns true if the status is "Never"
+func (t TimeOrStatus) IsNever() bool {
+	return t.Status == "Never"
+}
+
+// IsNotStarted returns true if the status is "Not Started"
+func (t TimeOrStatus) IsNotStarted() bool {
+	return t.Status == "Not Started"
+}
+
+// IsNotFinished returns true if the status is "Not Finished"
+func (t TimeOrStatus) IsNotFinished() bool {
+	return t.Status == "Not Finished"
+}
+
+// HasTime returns true if a valid time is set
+func (t TimeOrStatus) HasTime() bool {
+	return t.Time != nil
+}

@@ -18,3 +18,9 @@ type Event struct {
 
 // EventsResponse is the response from GET /events.json
 type EventsResponse []Event
+
+// RequestQueryOptions represents optional query parameters for events requests
+type RequestQueryOptions struct {
+	Filter   string // Filter by actor type: user, system, or all
+	Download bool   // For CSV: force download as attachment (set to true to add download=1)
+}

@@ -1,0 +1,35 @@
+[
+  {
+    "vulnerabilities": [
+      {
+        "clean_id": "CVE-2024-2466",
+        "cvss_score": 6.5
+      },
+      {
+        "clean_id": "THIS-IS-AN-INVALID-CVE-001",
+        "cvss_score": 8.0
+      }
+    ],
+    "formula": "curl",
+    "outdated_devices": [
+      "TC6R2DHVHG",
+      "1234567890"
+    ],
+    "supported": false,
+    "homebrew_core_version": "8.11.0_1"
+  },
+  {
+    "vulnerabilities": [
+      {
+        "clean_id": "CVE-2024-10524",
+        "cvss_score": null
+      }
+    ],
+    "formula": "wget",
+    "outdated_devices": [
+      "TC6R2DHVHG"
+    ],
+    "supported": false,
+    "homebrew_core_version": "1.25.0"
+  }
+]

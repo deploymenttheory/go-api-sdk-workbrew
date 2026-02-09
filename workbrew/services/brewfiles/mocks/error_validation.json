@@ -1,0 +1,6 @@
+{
+  "message": "An error occurred when trying to update Brewfile",
+  "errors": [
+    "Brewfile has an invalid line: tap \"foo/bar/baz\""
+  ]
+}

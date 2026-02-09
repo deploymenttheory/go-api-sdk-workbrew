@@ -1,0 +1,6 @@
+{
+  "message": "Brewfiles API is not available on your current plan.",
+  "errors": [
+    "Brewfiles cannot be created or updated on a Workbrew Free subscription."
+  ]
+}

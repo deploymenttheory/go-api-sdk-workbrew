@@ -1,0 +1,25 @@
+[
+  {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "event_type": "device.created",
+    "occurred_at": "2024-03-01T10:00:00Z",
+    "actor_id": null,
+    "actor_type": "User",
+    "target_id": null,
+    "target_type": "Device",
+    "target_identifier": "TC6R2DHVHG"
+  },
+  {
+    "id": "123e4567-e89b-12d3-a456-426614174001",
+    "event_type": "device.updated",
+    "occurred_at": "2024-03-02T10:00:00Z",
+    "actor_id": "user-123",
+    "actor_type": "User",
+    "target_id": "device-456",
+    "target_type": "Device",
+    "target_identifier": "TC6R2DHVHG",
+    "changes": {
+      "os_version": ["macOS 13.0", "macOS 14.0"]
+    }
+  }
+]

@@ -9,8 +9,8 @@ import (
 type (
 	// EventsServiceInterface defines the interface for events operations
 	EventsServiceInterface interface {
-		GetEvents(ctx context.Context, filter string) (*EventsResponse, error)
-		GetEventsCSV(ctx context.Context, filter string, download bool) ([]byte, error)
+		GetEvents(ctx context.Context, opts *RequestQueryOptions) (*EventsResponse, error)
+		GetEventsCSV(ctx context.Context, opts *RequestQueryOptions) ([]byte, error)
 	}
 
 	// Service handles communication with the events
@@ -34,7 +34,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/events.json
 //
 // Parameters:
-//   - filter: Filter by actor type (user, system, all)
+//   - opts: Optional query parameters (filter by actor type: user, system, all)
 //
 // Example cURL:
 //
@@ -43,7 +43,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: application/json" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/events.json?filter=user"
-func (s *Service) GetEvents(ctx context.Context, filter string) (*EventsResponse, error) {
+func (s *Service) GetEvents(ctx context.Context, opts *RequestQueryOptions) (*EventsResponse, error) {
 	endpoint := EndpointEventsJSON
 
 	headers := map[string]string{
@@ -51,8 +51,14 @@ func (s *Service) GetEvents(ctx context.Context, filter string) (*EventsResponse
 		"Content-Type": "application/json",
 	}
 
+	// Nil-safe options handling
+	if opts == nil {
+		opts = &RequestQueryOptions{}
+	}
+
+	// Build query parameters
 	queryParams := s.client.QueryBuilder().
-		AddIfNotEmpty("filter", filter).
+		AddIfNotEmpty("filter", opts.Filter).
 		Build()
 
 	var result EventsResponse
@@ -68,8 +74,7 @@ func (s *Service) GetEvents(ctx context.Context, filter string) (*EventsResponse
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/events.csv
 //
 // Parameters:
-//   - filter: Filter by actor type (user, system, all)
-//   - download: Set to true to force download as attachment
+//   - opts: Optional query parameters (filter by actor type, download flag)
 //
 // Example cURL:
 //
@@ -78,15 +83,21 @@ func (s *Service) GetEvents(ctx context.Context, filter string) (*EventsResponse
 //	  -H "X-Workbrew-API-Version: v0" \
 //	  -H "Accept: text/csv" \
 //	  "https://console.workbrew.com/workspaces/{workspace}/events.csv?filter=user&download=1"
-func (s *Service) GetEventsCSV(ctx context.Context, filter string, download bool) ([]byte, error) {
+func (s *Service) GetEventsCSV(ctx context.Context, opts *RequestQueryOptions) ([]byte, error) {
 	endpoint := EndpointEventsCSV
 
 	headers := map[string]string{
 		"Accept": "text/csv",
 	}
 
-	qb := s.client.QueryBuilder().AddIfNotEmpty("filter", filter)
-	if download {
+	// Nil-safe options handling
+	if opts == nil {
+		opts = &RequestQueryOptions{}
+	}
+
+	// Build query parameters
+	qb := s.client.QueryBuilder().AddIfNotEmpty("filter", opts.Filter)
+	if opts.Download {
 		qb.AddString("download", "1")
 	}
 	queryParams := qb.Build()

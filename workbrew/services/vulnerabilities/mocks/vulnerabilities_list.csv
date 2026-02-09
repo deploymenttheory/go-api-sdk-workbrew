@@ -1,0 +1,5 @@
+vulnerabilities,formula,outdated_devices,supported,homebrew_core_version
+"CVE-2024-11053, CVE-2024-6197, CVE-2024-7264, CVE-2024-8096, CVE-2024-9681, THIS-IS-AN-INVALID-CVE-001 (8.0)",curl,"TC6R2DHVHG, 1234567890",false,8.11.1
+"CVE-2024-10524, SOME-INVALID-CVE-002",wget,TC6R2DHVHG,false,1.25.0
+SOME-INVALID-CVE-001,ack,TC6R2DHVHG,false,3.8.1
+GHSA-rqgv-292v-5qgr (5.4),renovate,TC6R2DHVHG,false,39.125.0

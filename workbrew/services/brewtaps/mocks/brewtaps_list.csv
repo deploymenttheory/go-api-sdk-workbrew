@@ -1,0 +1,5 @@
+tap,devices,formulae_installed,casks_installed,available_packages
+Homebrew/homebrew-core,"TC6R2DHVHG, 1234567890",10,0,7388 Formulae
+Homebrew/homebrew-cask,TC6R2DHVHG,0,2,4901 Casks and 2411 Cask fonts
+apple/apple,TC6R2DHVHG,1,0,>=1 Packages
+workbrew/private,TC6R2DHVHG,0,1,>=1 Packages

@@ -1,0 +1,5 @@
+key,value,last_updated_by_user,device_group
+HOMEBREW_DEVELOPER,1,mikemcquaid,All Devices
+HOMEBREW_API_AUTO_UPDATE_SECS,1,mikemcquaid,All Devices
+HOMEBREW_FORBIDDEN_FORMULAE,util-linux ruby,mikemcquaid,All Devices
+HOMEBREW_FORBIDDEN_CASKS,1password-cli,mikemcquaid,All Devices

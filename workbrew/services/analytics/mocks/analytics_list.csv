@@ -1,0 +1,5 @@
+device,command,last_run,count
+TC6R2DHVHG,brew install curl,2024-01-01T12:34:56Z,2
+TC6R2DHVHG,brew install wget,2024-02-03T08:22:33Z,1
+TC6R2DHVHG,brew info curl,2024-04-15T14:45:22Z,1
+1234567890,brew upgrade git,2024-05-10T09:30:00Z,3

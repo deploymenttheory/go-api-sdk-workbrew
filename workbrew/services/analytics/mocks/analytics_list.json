@@ -1,0 +1,26 @@
+[
+  {
+    "device": "TC6R2DHVHG",
+    "command": "brew install curl",
+    "last_run": "2024-01-01T12:34:56Z",
+    "count": 2
+  },
+  {
+    "device": "TC6R2DHVHG",
+    "command": "brew install wget",
+    "last_run": "2024-02-03T08:22:33Z",
+    "count": 1
+  },
+  {
+    "device": "TC6R2DHVHG",
+    "command": "brew info curl",
+    "last_run": "2024-04-15T14:45:22Z",
+    "count": 1
+  },
+  {
+    "device": "1234567890",
+    "command": "brew upgrade git",
+    "last_run": "2024-05-10T09:30:00Z",
+    "count": 3
+  }
+]

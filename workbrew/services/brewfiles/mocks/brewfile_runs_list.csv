@@ -1,0 +1,3 @@
+label,device,created_at,updated_at,success,output,started_at,finished_at
+my-brewfile,TC6R2DHVHG,2025-07-03 12:50:45 UTC,2025-07-03 12:50:45 UTC,false,"",Not Started,Not Finished
+my-brewfile,1234567890,2023-11-01 12:34:56 UTC,2023-11-01 21:43:12 UTC,true,"Using git",2023-11-01 12:34:56 UTC,2023-11-01 21:43:12 UTC

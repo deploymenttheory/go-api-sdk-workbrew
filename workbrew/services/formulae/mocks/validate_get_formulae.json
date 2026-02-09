@@ -1,0 +1,54 @@
+[
+  {
+    "name": "curl",
+    "devices": [
+      "TC6R2DHVHG",
+      "1234567890"
+    ],
+    "outdated": true,
+    "installed_on_request": false,
+    "installed_as_dependency": true,
+    "vulnerabilities": [
+      "CVE-2024-2466",
+      "THIS-IS-AN-INVALID-CVE-001"
+    ],
+    "deprecated": "",
+    "license": [
+      "curl"
+    ],
+    "homebrew_core_version": "8.11.0_1"
+  },
+  {
+    "name": "actionlint",
+    "devices": [
+      "TC6R2DHVHG"
+    ],
+    "outdated": true,
+    "installed_on_request": false,
+    "installed_as_dependency": false,
+    "vulnerabilities": [],
+    "deprecated": "",
+    "license": [
+      "MIT"
+    ],
+    "homebrew_core_version": "1.7.7"
+  },
+  {
+    "name": "wget",
+    "devices": [
+      "TC6R2DHVHG"
+    ],
+    "outdated": true,
+    "installed_on_request": true,
+    "installed_as_dependency": false,
+    "vulnerabilities": [
+      "CVE-2024-10524",
+      "SOME-INVALID-CVE-002"
+    ],
+    "deprecated": "",
+    "license": [
+      "GPL-3.0-or-later"
+    ],
+    "homebrew_core_version": "1.25.0"
+  }
+]

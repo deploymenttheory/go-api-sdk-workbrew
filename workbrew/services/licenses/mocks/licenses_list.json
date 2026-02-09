@@ -1,0 +1,22 @@
+[
+  {
+    "name": "GPL-3.0-or-later",
+    "device_count": 2,
+    "formula_count": 2
+  },
+  {
+    "name": "MIT",
+    "device_count": 2,
+    "formula_count": 2
+  },
+  {
+    "name": "curl",
+    "device_count": 1,
+    "formula_count": 1
+  },
+  {
+    "name": "Artistic-2.0",
+    "device_count": 1,
+    "formula_count": 1
+  }
+]

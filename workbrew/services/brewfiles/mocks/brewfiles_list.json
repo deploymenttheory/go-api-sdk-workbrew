@@ -1,0 +1,22 @@
+[
+  {
+    "label": "my-brewfile",
+    "slug": "my-brewfile",
+    "content": "brew \"wget\"",
+    "last_updated_by_user": "onboarded",
+    "started_at": "Not Started",
+    "finished_at": "Not Finished",
+    "devices": [],
+    "run_count": 1
+  },
+  {
+    "label": "production",
+    "slug": "production",
+    "content": "brew \"git\"\nbrew \"node\"",
+    "last_updated_by_user": "admin",
+    "started_at": "2023-11-01T12:34:56.000Z",
+    "finished_at": "2023-11-01T21:43:12.000Z",
+    "devices": [],
+    "run_count": 5
+  }
+]

@@ -1,0 +1,39 @@
+[
+  {
+    "tap": "Homebrew/homebrew-core",
+    "devices": [
+      "TC6R2DHVHG",
+      "1234567890"
+    ],
+    "formulae_installed": 10,
+    "casks_installed": 0,
+    "available_packages": "7388 Formulae"
+  },
+  {
+    "tap": "Homebrew/homebrew-cask",
+    "devices": [
+      "TC6R2DHVHG"
+    ],
+    "formulae_installed": 0,
+    "casks_installed": 2,
+    "available_packages": "4901 Casks and 2411 Cask fonts"
+  },
+  {
+    "tap": "apple/apple",
+    "devices": [
+      "TC6R2DHVHG"
+    ],
+    "formulae_installed": 1,
+    "casks_installed": 0,
+    "available_packages": ">=1 Packages"
+  },
+  {
+    "tap": "workbrew/private",
+    "devices": [
+      "TC6R2DHVHG"
+    ],
+    "formulae_installed": 0,
+    "casks_installed": 1,
+    "available_packages": ">=1 Packages"
+  }
+]

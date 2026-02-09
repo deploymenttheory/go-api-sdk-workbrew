@@ -1,0 +1,2 @@
+serial_number,groups,mdm_user_or_device_name,last_seen_at,command_last_run_at,device_type,os_version,homebrew_prefix,homebrew_version,workbrew_version,formulae_count,casks_count
+TC6R2DHVHG,"[""OSX 14""]",Mike's MacBook Pro,2023-08-25 00:00:00 UTC,2024-01-01 00:00:00 UTC,MacBook Pro,macOS 14.0 (23A344),/opt/homebrew,4.1.15-24-g5e78ba3,0.2.1,9,3

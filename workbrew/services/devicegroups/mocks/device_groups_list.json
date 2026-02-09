@@ -1,0 +1,17 @@
+[
+  {
+    "id": "ddba0af6-bd3c-5abf-8311-e62dc6bd9fbc",
+    "name": "Admin",
+    "devices": [
+      "TC6R2DHVHG"
+    ]
+  },
+  {
+    "id": "377d8aa2-64cd-56a6-8351-6163bcf7dca1",
+    "name": "OSX 14",
+    "devices": [
+      "TC6R2DHVHG",
+      "1234567890"
+    ]
+  }
+]

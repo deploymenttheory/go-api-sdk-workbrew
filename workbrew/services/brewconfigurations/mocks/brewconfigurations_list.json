@@ -1,0 +1,26 @@
+[
+  {
+    "key": "HOMEBREW_DEVELOPER",
+    "value": "1",
+    "last_updated_by_user": "mikemcquaid",
+    "device_group": "All Devices"
+  },
+  {
+    "key": "HOMEBREW_API_AUTO_UPDATE_SECS",
+    "value": "1",
+    "last_updated_by_user": "mikemcquaid",
+    "device_group": "All Devices"
+  },
+  {
+    "key": "HOMEBREW_FORBIDDEN_FORMULAE",
+    "value": "util-linux ruby",
+    "last_updated_by_user": "mikemcquaid",
+    "device_group": "All Devices"
+  },
+  {
+    "key": "HOMEBREW_FORBIDDEN_CASKS",
+    "value": "1password-cli",
+    "last_updated_by_user": "mikemcquaid",
+    "device_group": "All Devices"
+  }
+]

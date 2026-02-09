@@ -1,0 +1,18 @@
+[
+  {
+    "serial_number": "TC6R2DHVHG",
+    "groups": [
+      "OSX 14"
+    ],
+    "mdm_user_or_device_name": "Mike's MacBook Pro",
+    "last_seen_at": "2023-08-25T00:00:00.000Z",
+    "command_last_run_at": "2024-01-01T00:00:00.000Z",
+    "device_type": "MacBook Pro",
+    "os_version": "macOS 14.0 (23A344)",
+    "homebrew_prefix": "/opt/homebrew",
+    "homebrew_version": "4.1.15-24-g5e78ba3",
+    "workbrew_version": "0.2.1",
+    "formulae_count": 9,
+    "casks_count": 3
+  }
+]

@@ -7,9 +7,9 @@ type BrewfileDevice struct {
 
 // Brewfile represents a single brewfile entry
 type Brewfile struct {
-	Label              string           `json:"label"`
-	Slug               string           `json:"slug"`
-	Content            string           `json:"content"`
+	Label              string           `json:"label,omitempty"`
+	Slug               string           `json:"slug,omitempty"`
+	Content            string           `json:"content,omitempty"`
 	LastUpdatedByUser  string           `json:"last_updated_by_user"`
 	StartedAt          string           `json:"started_at"`
 	FinishedAt         string           `json:"finished_at"`
@@ -41,11 +41,16 @@ type BrewfileMessageResponse struct {
 }
 
 // BrewfileRun represents a single brewfile run
+// Matches the actual API response schema
 type BrewfileRun struct {
-	Device     string `json:"device,omitempty"`
-	StartedAt  string `json:"started_at,omitempty"`
-	FinishedAt string `json:"finished_at,omitempty"`
-	Status     string `json:"status,omitempty"`
+	Label      string `json:"label"`
+	Device     string `json:"device"`
+	CreatedAt  string `json:"created_at"`
+	UpdatedAt  string `json:"updated_at"`
+	Success    bool   `json:"success"`
+	Output     string `json:"output"`
+	StartedAt  string `json:"started_at"`
+	FinishedAt string `json:"finished_at"`
 }
 
 // BrewfileRunsResponse is the response from GET /brewfiles/{label}/runs.json

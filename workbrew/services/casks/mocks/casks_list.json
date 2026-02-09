@@ -1,0 +1,33 @@
+[
+  {
+    "name": "logi-options+",
+    "display_name": "Logitech Options+",
+    "devices": [
+      "TC6R2DHVHG",
+      "1234567890"
+    ],
+    "outdated": true,
+    "deprecated": "",
+    "homebrew_cask_version": "8.11.0_1"
+  },
+  {
+    "name": "1password",
+    "display_name": "1Password",
+    "devices": [
+      "TC6R2DHVHG"
+    ],
+    "outdated": true,
+    "deprecated": "",
+    "homebrew_cask_version": "8.10.75"
+  },
+  {
+    "name": "workbrew/private/workbrew",
+    "display_name": null,
+    "devices": [
+      "TC6R2DHVHG"
+    ],
+    "outdated": false,
+    "deprecated": "",
+    "homebrew_cask_version": "0.0.5"
+  }
+]

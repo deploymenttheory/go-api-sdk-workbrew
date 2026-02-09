@@ -12,8 +12,8 @@ type BrewCommand struct {
 	Command            string                `json:"command"`
 	Label              string                `json:"label"`
 	LastUpdatedByUser  string                `json:"last_updated_by_user"`
-	StartedAt          devices.TimeOrNever   `json:"started_at"`  // date-time or "Not Started"
-	FinishedAt         devices.TimeOrNever   `json:"finished_at"` // date-time or "Not Finished"
+	StartedAt          devices.TimeOrStatus  `json:"started_at"`  // date-time or "Not Started"
+	FinishedAt         devices.TimeOrStatus  `json:"finished_at"` // date-time or "Not Finished"
 	Devices            []string              `json:"devices"`
 	RunCount           int                   `json:"run_count"`
 }
@@ -39,15 +39,15 @@ type CreateBrewCommandResponse struct {
 // BrewCommandRun represents a single execution of a brew command
 // Matches the schema from swagger specification
 type BrewCommandRun struct {
-	Command    string              `json:"command"`
-	Label      string              `json:"label"`
-	Device     string              `json:"device"`
-	CreatedAt  time.Time           `json:"created_at"`
-	UpdatedAt  time.Time           `json:"updated_at"`
-	Success    bool                `json:"success"`
-	Output     string              `json:"output"`
-	StartedAt  devices.TimeOrNever `json:"started_at"`  // date-time or "Not Started"
-	FinishedAt devices.TimeOrNever `json:"finished_at"` // date-time or "Not Finished"
+	Command    string               `json:"command"`
+	Label      string               `json:"label"`
+	Device     string               `json:"device"`
+	CreatedAt  time.Time            `json:"created_at"`
+	UpdatedAt  time.Time            `json:"updated_at"`
+	Success    bool                 `json:"success"`
+	Output     string               `json:"output"`
+	StartedAt  devices.TimeOrStatus `json:"started_at"`  // date-time or "Not Started"
+	FinishedAt devices.TimeOrStatus `json:"finished_at"` // date-time or "Not Finished"
 }
 
 // BrewCommandRunsResponse represents the response from the runs.json endpoint

@@ -1,0 +1,5 @@
+name,devices,outdated,installed_on_request,installed_as_dependency,vulnerabilities,deprecated,license,homebrew_core_version
+curl,"TC6R2DHVHG, 1234567890",true,false,true,"CVE-2024-11053, CVE-2024-6197, CVE-2024-7264, CVE-2024-8096, CVE-2024-9681, THIS-IS-AN-INVALID-CVE-001","",curl,8.11.1
+actionlint,TC6R2DHVHG,true,false,false,"","",MIT,1.7.7
+ack,TC6R2DHVHG,true,false,false,SOME-INVALID-CVE-001,"",Artistic-2.0,3.8.1
+wget,TC6R2DHVHG,true,true,false,"CVE-2024-10524, SOME-INVALID-CVE-002","",GPL-3.0-or-later,1.25.0
