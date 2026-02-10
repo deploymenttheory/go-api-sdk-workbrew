@@ -104,7 +104,7 @@ All 13 Workbrew API services are fully supported with complete CRUD operations w
 | **Vulnerabilities** | 2 | List, List CSV |
 | **Vulnerability Changes** | 2 | List (filterable), List CSV |
 
-📖 **[Browse 34 Complete Examples →](./examples/workbrew/)**
+📖 **[Browse Examples →](./examples/workbrew/)**
 
 The examples directory contains a working example for every CRUD operation, organized by service:
 - `analytics/` - 2 examples
@@ -292,8 +292,8 @@ This SDK follows the same architecture pattern as the [go-api-sdk-apple](https:/
 
 ## Contributing
 
-This is a community SDK following deployment theology architecture standards. For issues or feature requests, please open an issue on GitHub.
+This is a community SDK following deployment Theory architecture standards. For issues or feature requests, please open an issue on GitHub.
 
 ## License
 
-Copyright © 2026 Deployment Theology. All rights reserved.
+Copyright © 2026 Deployment Theory. All rights reserved.
