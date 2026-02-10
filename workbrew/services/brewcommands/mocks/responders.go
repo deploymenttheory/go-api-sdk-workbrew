@@ -46,7 +46,7 @@ func (m *BrewCommandsMock) RegisterMocks(baseURL string) {
 		}
 
 		// Validate request
-		var requestBody map[string]interface{}
+		var requestBody map[string]any
 		if err := json.Unmarshal(bodyBytes, &requestBody); err != nil {
 			return httpmock.NewStringResponse(400, `{"message":"Bad Request","errors":["Invalid JSON"]}`), nil
 		}

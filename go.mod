@@ -1,6 +1,6 @@
 module github.com/deploymenttheory/go-api-sdk-workbrew
 
-go 1.23.0
+go 1.25.0
 
 require (
 	github.com/jarcoal/httpmock v1.4.1
