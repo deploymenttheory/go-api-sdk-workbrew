@@ -20,7 +20,6 @@ func main() {
 		log.Fatal("WORKBREW_API_KEY and WORKBREW_WORKSPACE environment variables must be set")
 	}
 
-	// Create logger
 	logger, err := zap.NewProduction()
 	if err != nil {
 		log.Fatalf("Failed to create logger: %v", err)
