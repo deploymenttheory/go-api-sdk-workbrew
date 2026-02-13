@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"io"
 
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/interfaces"
 	"go.uber.org/zap"
@@ -124,8 +125,81 @@ func (c *Client) DeleteWithBody(ctx context.Context, path string, body any, head
 	return c.executeRequest(req, "DELETE", path)
 }
 
-// GetCSV performs a GET request for CSV format and returns raw bytes
-func (c *Client) GetCSV(ctx context.Context, path string, queryParams map[string]string, headers map[string]string) (*interfaces.Response, []byte, error) {
+// PostForm executes a POST request with form-urlencoded data
+func (c *Client) PostForm(ctx context.Context, path string, formData map[string]string, headers map[string]string, result any) (*interfaces.Response, error) {
+	req := c.client.R().
+		SetContext(ctx).
+		SetResult(result)
+
+	if formData != nil {
+		req.SetFormData(formData)
+	}
+
+	// Apply headers with precedence (global first, then per-request)
+	// Note: Content-Type is handled automatically by resty for form data
+	for k, v := range c.globalHeaders {
+		if v != "" && k != "Content-Type" {
+			req.SetHeader(k, v)
+		}
+	}
+	for k, v := range headers {
+		if v != "" && k != "Content-Type" {
+			req.SetHeader(k, v)
+		}
+	}
+
+	return c.executeRequest(req, "POST", path)
+}
+
+// PostMultipart executes a POST request with multipart form data and progress tracking
+func (c *Client) PostMultipart(ctx context.Context, path string, fileField string, fileName string, fileReader io.Reader, fileSize int64, formFields map[string]string, headers map[string]string, progressCallback interfaces.MultipartProgressCallback, result any) (*interfaces.Response, error) {
+	req := c.client.R().
+		SetContext(ctx).
+		SetResult(result)
+
+	// Set file field using SetMultipartFields with progress callback
+	if fileReader != nil && fileName != "" && fileField != "" {
+		multipartField := &resty.MultipartField{
+			Name:     fileField,
+			FileName: fileName,
+			Reader:   fileReader,
+			FileSize: fileSize,
+		}
+
+		// Add progress callback if provided
+		if progressCallback != nil {
+			multipartField.ProgressCallback = func(progress resty.MultipartFieldProgress) {
+				progressCallback(progress.Name, progress.FileName, progress.Written, progress.FileSize)
+			}
+		}
+
+		req.SetMultipartFields(multipartField)
+	}
+
+	// Set form fields using SetMultipartFormData for multipart requests
+	if len(formFields) > 0 {
+		req.SetMultipartFormData(formFields)
+	}
+
+	// Apply headers with precedence (global first, then per-request)
+	// Note: Content-Type is handled automatically by resty for multipart
+	for k, v := range c.globalHeaders {
+		if v != "" && k != "Content-Type" {
+			req.SetHeader(k, v)
+		}
+	}
+	for k, v := range headers {
+		if v != "" && k != "Content-Type" {
+			req.SetHeader(k, v)
+		}
+	}
+
+	return c.executeRequest(req, "POST", path)
+}
+
+// GetBytes performs a GET request and returns raw bytes without unmarshaling
+// Use this for non-JSON responses like CSV, HTML, binary files, etc.
+func (c *Client) GetBytes(ctx context.Context, path string, queryParams map[string]string, headers map[string]string) (*interfaces.Response, []byte, error) {
 	var apiErr APIError
 	req := c.client.R().
 		SetContext(ctx).
@@ -139,17 +213,17 @@ func (c *Client) GetCSV(ctx context.Context, path string, queryParams map[string
 
 	c.applyHeaders(req, headers)
 
-	c.logger.Debug("Executing CSV request",
+	c.logger.Debug("Executing bytes request",
 		zap.String("method", "GET"),
 		zap.String("path", path))
 
 	resp, err := req.Get(path)
 	ifaceResp := toInterfaceResponse(resp)
 	if err != nil {
-		c.logger.Error("CSV request failed",
+		c.logger.Error("Bytes request failed",
 			zap.String("path", path),
 			zap.Error(err))
-		return ifaceResp, nil, fmt.Errorf("CSV request failed: %w", err)
+		return ifaceResp, nil, fmt.Errorf("bytes request failed: %w", err)
 	}
 
 	if resp.IsError() {
@@ -164,7 +238,7 @@ func (c *Client) GetCSV(ctx context.Context, path string, queryParams map[string
 	}
 
 	body := []byte(resp.String())
-	c.logger.Debug("CSV request completed successfully",
+	c.logger.Debug("Bytes request completed successfully",
 		zap.String("path", path),
 		zap.Int("status_code", resp.StatusCode()),
 		zap.Int("content_length", len(body)))

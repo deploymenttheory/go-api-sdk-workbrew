@@ -73,7 +73,7 @@ func (s *Service) ListDevicesCSV(ctx context.Context) ([]byte, *interfaces.Respo
 
 	queryParams := make(map[string]string)
 
-	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetBytes(ctx, endpoint, queryParams, headers)
 	if err != nil {
 		return nil, resp, err
 	}

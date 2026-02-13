@@ -89,7 +89,7 @@ func (s *Service) ListBrewCommandsCSV(ctx context.Context) ([]byte, *interfaces.
 
 	queryParams := make(map[string]string)
 
-	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetBytes(ctx, endpoint, queryParams, headers)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -161,7 +161,7 @@ func (s *Service) ListBrewCommandRunsCSV(ctx context.Context, brewCommandLabel s
 
 	queryParams := make(map[string]string)
 
-	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetBytes(ctx, endpoint, queryParams, headers)
 	if err != nil {
 		return nil, resp, err
 	}

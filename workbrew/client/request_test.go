@@ -3,8 +3,10 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"go.uber.org/zap/zaptest"
@@ -450,7 +452,261 @@ func TestDeleteWithBody_NilBody(t *testing.T) {
 	}
 }
 
-func TestGetCSV_Success(t *testing.T) {
+func TestPostForm_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("Expected POST request, got %s", r.Method)
+		}
+
+		// Verify Content-Type is form-urlencoded
+		contentType := r.Header.Get("Content-Type")
+		if !strings.Contains(contentType, "application/x-www-form-urlencoded") {
+			t.Errorf("Expected Content-Type to contain application/x-www-form-urlencoded, got %s", contentType)
+		}
+
+		// Parse form data
+		if err := r.ParseForm(); err != nil {
+			t.Errorf("Failed to parse form: %v", err)
+		}
+
+		if r.FormValue("username") != "testuser" {
+			t.Errorf("Expected username=testuser, got %s", r.FormValue("username"))
+		}
+
+		if r.FormValue("password") != "testpass" {
+			t.Errorf("Expected password=testpass, got %s", r.FormValue("password"))
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(testResponse{
+			ID:      "form-123",
+			Message: "form submitted",
+		})
+	}))
+	defer server.Close()
+
+	client := setupTestClient(t, server.URL)
+
+	formData := map[string]string{
+		"username": "testuser",
+		"password": "testpass",
+	}
+
+	var result testResponse
+	resp, err := client.PostForm(
+		context.Background(),
+		"/test/form",
+		formData,
+		nil,
+		&result,
+	)
+
+	if err != nil {
+		t.Fatalf("PostForm() error = %v, want nil", err)
+	}
+
+	if resp.StatusCode != 200 {
+		t.Errorf("StatusCode = %d, want 200", resp.StatusCode)
+	}
+
+	if result.ID != "form-123" {
+		t.Errorf("ID = %q, want %q", result.ID, "form-123")
+	}
+
+	if result.Message != "form submitted" {
+		t.Errorf("Message = %q, want %q", result.Message, "form submitted")
+	}
+}
+
+func TestPostForm_NilFormData(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(testResponse{ID: "test"})
+	}))
+	defer server.Close()
+
+	client := setupTestClient(t, server.URL)
+
+	var result testResponse
+	_, err := client.PostForm(
+		context.Background(),
+		"/test",
+		nil,
+		nil,
+		&result,
+	)
+
+	if err != nil {
+		t.Fatalf("PostForm() error = %v, want nil", err)
+	}
+}
+
+func TestPostMultipart_Success(t *testing.T) {
+	expectedFileName := "test.txt"
+	expectedFileContent := "test file content"
+	expectedFieldName := "uploadedFile"
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("Expected POST request, got %s", r.Method)
+		}
+
+		// Verify Content-Type is multipart
+		contentType := r.Header.Get("Content-Type")
+		if !strings.Contains(contentType, "multipart/form-data") {
+			t.Errorf("Expected Content-Type to contain multipart/form-data, got %s", contentType)
+		}
+
+		// Parse multipart form
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			t.Errorf("Failed to parse multipart form: %v", err)
+		}
+
+		// Verify form field
+		if r.FormValue("description") != "test description" {
+			t.Errorf("Expected description='test description', got %s", r.FormValue("description"))
+		}
+
+		// Verify file
+		file, header, err := r.FormFile(expectedFieldName)
+		if err != nil {
+			t.Errorf("Failed to get file: %v", err)
+		}
+		defer file.Close()
+
+		if header.Filename != expectedFileName {
+			t.Errorf("Expected filename %q, got %q", expectedFileName, header.Filename)
+		}
+
+		fileContent, _ := io.ReadAll(file)
+		if string(fileContent) != expectedFileContent {
+			t.Errorf("Expected file content %q, got %q", expectedFileContent, string(fileContent))
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(testResponse{
+			ID:      "upload-123",
+			Message: "file uploaded",
+		})
+	}))
+	defer server.Close()
+
+	client := setupTestClient(t, server.URL)
+
+	fileContent := strings.NewReader(expectedFileContent)
+	formFields := map[string]string{
+		"description": "test description",
+	}
+
+	progressCalled := false
+	progressCallback := func(fieldName, fileName string, bytesWritten, totalBytes int64) {
+		progressCalled = true
+		if fieldName != expectedFieldName {
+			t.Errorf("Progress callback fieldName = %q, want %q", fieldName, expectedFieldName)
+		}
+		if fileName != expectedFileName {
+			t.Errorf("Progress callback fileName = %q, want %q", fileName, expectedFileName)
+		}
+	}
+
+	var result testResponse
+	resp, err := client.PostMultipart(
+		context.Background(),
+		"/test/upload",
+		expectedFieldName,
+		expectedFileName,
+		fileContent,
+		int64(len(expectedFileContent)),
+		formFields,
+		nil,
+		progressCallback,
+		&result,
+	)
+
+	if err != nil {
+		t.Fatalf("PostMultipart() error = %v, want nil", err)
+	}
+
+	if resp.StatusCode != 201 {
+		t.Errorf("StatusCode = %d, want 201", resp.StatusCode)
+	}
+
+	if result.ID != "upload-123" {
+		t.Errorf("ID = %q, want %q", result.ID, "upload-123")
+	}
+
+	if result.Message != "file uploaded" {
+		t.Errorf("Message = %q, want %q", result.Message, "file uploaded")
+	}
+
+	if !progressCalled {
+		t.Error("Progress callback was not called")
+	}
+}
+
+func TestPostMultipart_NilCallback(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(testResponse{ID: "test"})
+	}))
+	defer server.Close()
+
+	client := setupTestClient(t, server.URL)
+
+	fileContent := strings.NewReader("test")
+	var result testResponse
+	_, err := client.PostMultipart(
+		context.Background(),
+		"/test/upload",
+		"file",
+		"test.txt",
+		fileContent,
+		4,
+		nil,
+		nil,
+		nil, // nil progress callback
+		&result,
+	)
+
+	if err != nil {
+		t.Fatalf("PostMultipart() error = %v, want nil", err)
+	}
+}
+
+func TestPostMultipart_EmptyFile(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(testResponse{ID: "test"})
+	}))
+	defer server.Close()
+
+	client := setupTestClient(t, server.URL)
+
+	var result testResponse
+	_, err := client.PostMultipart(
+		context.Background(),
+		"/test/upload",
+		"",  // empty field name
+		"",  // empty file name
+		nil, // nil reader
+		0,
+		nil,
+		nil,
+		nil,
+		&result,
+	)
+
+	if err != nil {
+		t.Fatalf("PostMultipart() error = %v, want nil", err)
+	}
+}
+
+func TestGetBytes_Success(t *testing.T) {
 	csvData := "id,name\n1,test1\n2,test2"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -471,7 +727,7 @@ func TestGetCSV_Success(t *testing.T) {
 
 	client := setupTestClient(t, server.URL)
 
-	resp, data, err := client.GetCSV(
+	resp, data, err := client.GetBytes(
 		context.Background(),
 		"/test/export",
 		map[string]string{"format": "csv"},
@@ -479,11 +735,11 @@ func TestGetCSV_Success(t *testing.T) {
 	)
 
 	if err != nil {
-		t.Fatalf("GetCSV() error = %v, want nil", err)
+		t.Fatalf("GetBytes() error = %v, want nil", err)
 	}
 
 	if resp == nil {
-		t.Fatal("GetCSV() response is nil")
+		t.Fatal("GetBytes() response is nil")
 	}
 
 	if resp.StatusCode != 200 {
@@ -495,7 +751,7 @@ func TestGetCSV_Success(t *testing.T) {
 	}
 }
 
-func TestGetCSV_Error(t *testing.T) {
+func TestGetBytes_Error(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
@@ -507,7 +763,7 @@ func TestGetCSV_Error(t *testing.T) {
 
 	client := setupTestClient(t, server.URL)
 
-	resp, data, err := client.GetCSV(
+	resp, data, err := client.GetBytes(
 		context.Background(),
 		"/test/not-found",
 		nil,
@@ -515,15 +771,15 @@ func TestGetCSV_Error(t *testing.T) {
 	)
 
 	if err == nil {
-		t.Fatal("GetCSV() error = nil, want error")
+		t.Fatal("GetBytes() error = nil, want error")
 	}
 
 	if resp == nil {
-		t.Fatal("GetCSV() response is nil, should return metadata even on error")
+		t.Fatal("GetBytes() response is nil, should return metadata even on error")
 	}
 
 	if data != nil {
-		t.Errorf("GetCSV() data should be nil on error, got %v", data)
+		t.Errorf("GetBytes() data should be nil on error, got %v", data)
 	}
 
 	// Verify it's an APIError
@@ -534,6 +790,39 @@ func TestGetCSV_Error(t *testing.T) {
 
 	if apiErr != nil && apiErr.StatusCode != 404 {
 		t.Errorf("StatusCode = %d, want 404", apiErr.StatusCode)
+	}
+}
+
+func TestGetCSV_BackwardsCompatibility(t *testing.T) {
+	// Test that GetCSV still works as a backwards-compatible alias
+	csvData := "id,name\n1,test1"
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/csv")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(csvData))
+	}))
+	defer server.Close()
+
+	client := setupTestClient(t, server.URL)
+
+	resp, data, err := client.GetBytes(
+		context.Background(),
+		"/test/export",
+		nil,
+		nil,
+	)
+
+	if err != nil {
+		t.Fatalf("GetCSV() error = %v, want nil", err)
+	}
+
+	if resp.StatusCode != 200 {
+		t.Errorf("StatusCode = %d, want 200", resp.StatusCode)
+	}
+
+	if string(data) != csvData {
+		t.Errorf("CSV data = %q, want %q", string(data), csvData)
 	}
 }
 

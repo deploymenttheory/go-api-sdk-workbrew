@@ -7,7 +7,8 @@ import (
 	"resty.dev/v3"
 )
 
-// AuthConfig holds authentication configuration for the Workbrew API
+// AuthConfig holds authentication configuration for the Workbrew API.
+// It contains the API key and optional API version for authenticating requests.
 type AuthConfig struct {
 	// APIKey is the bearer token for authentication
 	APIKey string
@@ -16,7 +17,11 @@ type AuthConfig struct {
 	APIVersion string
 }
 
-// Validate checks if the auth configuration is valid
+// Validate checks if the authentication configuration is valid.
+// It ensures that the API key is not empty before allowing API requests.
+//
+// Returns:
+//   - error: ValidationError if API key is missing, nil if valid
 func (a *AuthConfig) Validate() error {
 	if a.APIKey == "" {
 		return fmt.Errorf("API key is required")
@@ -24,7 +29,22 @@ func (a *AuthConfig) Validate() error {
 	return nil
 }
 
-// SetupAuthentication configures the resty client with bearer token authentication
+// SetupAuthentication configures the HTTP client with bearer token authentication.
+// It sets the Authorization header and API version header for all requests.
+//
+// Parameters:
+//   - client: The resty HTTP client to configure
+//   - authConfig: Authentication configuration containing API key and version
+//   - logger: Logger instance for logging authentication setup
+//
+// Returns:
+//   - error: Any error encountered during authentication setup
+//
+// The function:
+//   - Validates the authentication configuration
+//   - Sets Bearer token authentication scheme
+//   - Adds the API version header (X-Workbrew-API-Version)
+//   - Logs successful authentication configuration
 func SetupAuthentication(client *resty.Client, authConfig *AuthConfig, logger *zap.Logger) error {
 	if err := authConfig.Validate(); err != nil {
 		logger.Error("Authentication validation failed", zap.Error(err))

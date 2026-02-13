@@ -78,10 +78,10 @@ func WithUserAgent(userAgent string) ClientOption {
 }
 
 // WithCustomAgent allows appending a custom identifier to the default user agent
-// Format: "go-api-sdk-workbrew/1.0.0; <customAgent>"
+// Format: "go-api-sdk-workbrew/1.0.0; <customAgent>; gzip"
 func WithCustomAgent(customAgent string) ClientOption {
 	return func(c *Client) error {
-		enhancedUA := fmt.Sprintf("%s/%s; %s", UserAgentBase, Version, customAgent)
+		enhancedUA := fmt.Sprintf("%s/%s; %s; gzip", UserAgentBase, Version, customAgent)
 		c.client.SetHeader("User-Agent", enhancedUA)
 		c.userAgent = enhancedUA
 		c.logger.Info("Custom agent configured", zap.String("user_agent", enhancedUA))

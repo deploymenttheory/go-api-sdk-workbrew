@@ -99,7 +99,7 @@ func (s *Service) ListBrewfilesCSV(ctx context.Context) ([]byte, *interfaces.Res
 
 	queryParams := make(map[string]string)
 
-	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetBytes(ctx, endpoint, queryParams, headers)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -221,7 +221,7 @@ func (s *Service) ListBrewfileRunsCSV(ctx context.Context, label string) ([]byte
 
 	queryParams := make(map[string]string)
 
-	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetBytes(ctx, endpoint, queryParams, headers)
 	if err != nil {
 		return nil, resp, err
 	}

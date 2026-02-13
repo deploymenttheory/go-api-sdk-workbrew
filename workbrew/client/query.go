@@ -7,7 +7,19 @@ import (
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/interfaces"
 )
 
-// QueryBuilder provides a fluent interface for building query parameters
+// QueryBuilder provides a fluent interface for building URL query parameters.
+// It offers type-safe methods for adding parameters and handles empty value filtering automatically.
+//
+// Example:
+//
+//	query := NewQueryBuilder().
+//	    AddString("name", "workbrew").
+//	    AddInt("limit", 100).
+//	    AddBool("active", true).
+//	    AddTime("created_after", time.Now().Add(-24*time.Hour))
+//
+//	params := query.Build()
+//	// params = {"name": "workbrew", "limit": "100", "active": "true", "created_after": "2026-02-12T..."}
 type QueryBuilder struct {
 	params map[string]string
 }
@@ -16,7 +28,15 @@ type QueryBuilder struct {
 var _ interfaces.QueryBuilder = (*QueryBuilder)(nil)
 var _ interfaces.ServiceQueryBuilder = (*QueryBuilder)(nil)
 
-// NewQueryBuilder creates a new query builder
+// NewQueryBuilder creates a new query builder instance with an empty parameter set.
+//
+// Returns:
+//   - *QueryBuilder: A new query builder ready to accept parameters
+//
+// Example:
+//
+//	qb := NewQueryBuilder()
+//	qb.AddString("search", "homebrew").AddInt("page", 1)
 func NewQueryBuilder() *QueryBuilder {
 	return &QueryBuilder{
 		params: make(map[string]string),
@@ -143,7 +163,16 @@ func (qb *QueryBuilder) Get(key string) string {
 	return qb.params[key]
 }
 
-// Build returns the final map of query parameters
+// Build returns a copy of the query parameters as a map.
+// The returned map is a copy to prevent external modification of the builder's internal state.
+//
+// Returns:
+//   - map[string]string: Copy of all query parameters
+//
+// Example:
+//
+//	params := qb.AddString("name", "test").AddInt("limit", 50).Build()
+//	// params = {"name": "test", "limit": "50"}
 func (qb *QueryBuilder) Build() map[string]string {
 	// Return a copy to prevent external modification
 	result := make(map[string]string, len(qb.params))
@@ -153,7 +182,17 @@ func (qb *QueryBuilder) Build() map[string]string {
 	return result
 }
 
-// BuildString returns the query parameters as a URL-encoded string
+// BuildString returns the query parameters as a URL-encoded string.
+// Parameters are joined with "&" in key=value format.
+//
+// Returns:
+//   - string: URL-encoded query string (e.g., "name=test&limit=50"), or empty string if no parameters
+//
+// Example:
+//
+//	queryString := qb.AddString("name", "test").AddInt("page", 1).BuildString()
+//	// queryString = "name=test&page=1"
+//	url := baseURL + "?" + queryString
 func (qb *QueryBuilder) BuildString() string {
 	if len(qb.params) == 0 {
 		return ""

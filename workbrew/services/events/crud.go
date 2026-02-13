@@ -93,7 +93,7 @@ func (s *Service) ListEventsCSV(ctx context.Context, opts *RequestQueryOptions) 
 	}
 	queryParams := qb.Build()
 
-	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetBytes(ctx, endpoint, queryParams, headers)
 	if err != nil {
 		return nil, resp, err
 	}

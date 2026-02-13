@@ -139,7 +139,7 @@ func TestParseErrorResponse_ValidJSON(t *testing.T) {
 			status:         "401 Unauthorized",
 			method:         "GET",
 			endpoint:       "/api/v1/data",
-			wantMessage:    "Authentication required or invalid API key",
+			wantMessage:    "Authentication required or invalid API key. Verify that you have provided your correct API key.",
 			wantErrors:     nil,
 			wantStatusCode: 401,
 		},
@@ -226,7 +226,7 @@ func TestParseErrorResponse_InvalidJSON(t *testing.T) {
 			name:           "empty body uses default message",
 			body:           "",
 			statusCode:     503,
-			wantMessage:    "Service temporarily unavailable",
+			wantMessage:    "Service temporarily unavailable. Retry might work.",
 			wantStatusCode: 503,
 		},
 		{
@@ -274,14 +274,18 @@ func TestGetDefaultErrorMessage(t *testing.T) {
 		statusCode int
 		want       string
 	}{
-		{StatusBadRequest, "Bad request"},
-		{StatusUnauthorized, "Authentication required or invalid API key"},
-		{StatusForbidden, "Access forbidden - may require plan upgrade"},
+		{StatusBadRequest, "Bad request - the request is invalid or malformed"},
+		{StatusUnauthorized, "Authentication required or invalid API key. Verify that you have provided your correct API key."},
+		{StatusForbidden, "Access forbidden - you are not allowed to perform this operation. May require plan upgrade."},
 		{StatusNotFound, "Resource not found"},
-		{StatusUnprocessableEntity, "Validation error"},
+		{StatusConflict, "Resource already exists"},
+		{StatusUnprocessableEntity, "Validation error - the request contains invalid parameters"},
+		{StatusFailedDependency, "The request depended on another request that failed"},
+		{StatusTooManyRequests, "Rate limit exceeded. Too many requests have been made in a given amount of time. Please retry after some time."},
 		{StatusInternalServerError, "Internal server error"},
 		{StatusBadGateway, "Bad gateway"},
-		{StatusServiceUnavailable, "Service temporarily unavailable"},
+		{StatusServiceUnavailable, "Service temporarily unavailable. Retry might work."},
+		{StatusGatewayTimeout, "The operation took too long to complete. Request timeout."},
 		{999, "Unknown error"},
 		{418, "Unknown error"}, // I'm a teapot
 	}
