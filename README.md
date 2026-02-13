@@ -26,21 +26,6 @@ Get started quickly with the SDK using the **[Quick Start Guide](docs/guides/qui
 
 The [examples directory](examples/workbrew/) contains complete working examples for all SDK features:
 
-Each example includes a complete `main.go` with comments explaining the code. Browse by service:
-- `analytics/` - 2 examples
-- `brewcommands/` - 5 examples
-- `brewconfigurations/` - 2 examples
-- `brewtaps/` - 2 examples
-- `brewfiles/` - 7 examples (full CRUD)
-- `casks/` - 2 examples
-- `devicegroups/` - 2 examples
-- `devices/` - 2 examples
-- `events/` - 2 examples
-- `formulae/` - 2 examples
-- `licenses/` - 2 examples
-- `vulnerabilities/` - 2 examples
-- `vulnerabilitychanges/` - 2 examples
-
 ## SDK Services
 
 ### Device Management
