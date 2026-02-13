@@ -37,7 +37,7 @@ func main() {
 	brewCommandsService := brewcommands.NewService(httpClient)
 
 	ctx := context.Background()
-	runs, err := brewCommandsService.ListBrewCommandRuns(ctx, brewCommandLabel)
+	runs, _, err := brewCommandsService.ListBrewCommandRuns(ctx, brewCommandLabel)
 	if err != nil {
 		log.Fatalf("Failed to list brew command runs: %v", err)
 	}

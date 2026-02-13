@@ -37,7 +37,7 @@ func TestListFormulae_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListFormulae(ctx)
+	result, _, err := service.ListFormulae(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -83,7 +83,7 @@ func TestListFormulae_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListFormulae(ctx)
+	result, _, err := service.ListFormulae(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -99,7 +99,7 @@ func TestListFormulaeCSV_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListFormulaeCSV(ctx)
+	csvData, _, err := service.ListFormulaeCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -124,7 +124,7 @@ func TestListFormulaeCSV_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListFormulaeCSV(ctx)
+	result, _, err := service.ListFormulaeCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

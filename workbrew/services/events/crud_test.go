@@ -46,7 +46,7 @@ func TestListEvents_Success_NoFilter(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListEvents(ctx, nil) // Test nil options
+	result, _, err := service.ListEvents(ctx, nil) // Test nil options
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -71,7 +71,7 @@ func TestListEvents_Success_WithFilter(t *testing.T) {
 	ctx := context.Background()
 
 	// Test with user filter
-	result, err := service.ListEvents(ctx, &RequestQueryOptions{
+	result, _, err := service.ListEvents(ctx, &RequestQueryOptions{
 		Filter: "user",
 	})
 
@@ -91,7 +91,7 @@ func TestListEvents_Success_EmptyOptions(t *testing.T) {
 	ctx := context.Background()
 
 	// Test with empty options struct
-	result, err := service.ListEvents(ctx, &RequestQueryOptions{})
+	result, _, err := service.ListEvents(ctx, &RequestQueryOptions{})
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -107,7 +107,7 @@ func TestListEvents_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListEvents(ctx, nil)
+	result, _, err := service.ListEvents(ctx, nil)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -123,7 +123,7 @@ func TestListEventsCSV_Success_NoOptions(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListEventsCSV(ctx, nil)
+	csvData, _, err := service.ListEventsCSV(ctx, nil)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -143,7 +143,7 @@ func TestListEventsCSV_Success_WithFilter(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListEventsCSV(ctx, &RequestQueryOptions{
+	csvData, _, err := service.ListEventsCSV(ctx, &RequestQueryOptions{
 		Filter: "system",
 	})
 
@@ -161,7 +161,7 @@ func TestListEventsCSV_Success_WithDownload(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListEventsCSV(ctx, &RequestQueryOptions{
+	csvData, _, err := service.ListEventsCSV(ctx, &RequestQueryOptions{
 		Filter:   "all",
 		Download: true,
 	})
@@ -192,7 +192,7 @@ func TestListEventsCSV_Success_AllFilters(t *testing.T) {
 			defer mockHandler.CleanupMockState()
 
 			ctx := context.Background()
-			csvData, err := service.ListEventsCSV(ctx, &RequestQueryOptions{
+			csvData, _, err := service.ListEventsCSV(ctx, &RequestQueryOptions{
 				Filter: tc.filter,
 			})
 
@@ -210,7 +210,7 @@ func TestListEventsCSV_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListEventsCSV(ctx, nil)
+	result, _, err := service.ListEventsCSV(ctx, nil)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -229,12 +229,12 @@ func TestRequestQueryOptions_NilSafety(t *testing.T) {
 	ctx := context.Background()
 
 	// Test ListEvents with nil
-	events, err := service.ListEvents(ctx, nil)
+	events, _, err := service.ListEvents(ctx, nil)
 	require.NoError(t, err)
 	require.NotNil(t, events)
 
 	// Test ListEventsCSV with nil
-	csv, err := service.ListEventsCSV(ctx, nil)
+	csv, _, err := service.ListEventsCSV(ctx, nil)
 	require.NoError(t, err)
 	require.NotNil(t, csv)
 }

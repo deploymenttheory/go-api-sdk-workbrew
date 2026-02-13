@@ -15,27 +15,27 @@ type (
 		// ListBrewCommands returns a list of brew commands with their configuration and status
 		//
 		// Returns brew commands with command, label, last updated user, start/finish timestamps, devices, and run count
-		ListBrewCommands(ctx context.Context) (*BrewCommandsResponse, error)
+		ListBrewCommands(ctx context.Context) (*BrewCommandsResponse, *interfaces.Response, error)
 
 		// ListBrewCommandsCSV returns a list of brew commands in CSV format
 		//
 		// Returns the same brew commands data as ListBrewCommands but formatted as CSV
-		ListBrewCommandsCSV(ctx context.Context) ([]byte, error)
+		ListBrewCommandsCSV(ctx context.Context) ([]byte, *interfaces.Response, error)
 
 		// CreateBrewCommand creates a new brew command with specified arguments and optional device/timing configuration
 		//
 		// Requires arguments field. Optional fields include device_ids, run_after_datetime, and recurrence (once, daily, weekly, monthly)
-		CreateBrewCommand(ctx context.Context, request *CreateBrewCommandRequest) (*CreateBrewCommandResponse, error)
+		CreateBrewCommand(ctx context.Context, request *CreateBrewCommandRequest) (*CreateBrewCommandResponse, *interfaces.Response, error)
 
 		// ListBrewCommandRuns returns a list of brew command runs for a specific brew command
 		//
 		// Returns run history including command, label, device, timestamps, success status, and output for the specified brew command label
-		ListBrewCommandRuns(ctx context.Context, brewCommandLabel string) (*BrewCommandRunsResponse, error)
+		ListBrewCommandRuns(ctx context.Context, brewCommandLabel string) (*BrewCommandRunsResponse, *interfaces.Response, error)
 
 		// ListBrewCommandRunsCSV returns a list of brew command runs in CSV format
 		//
 		// Returns the same run data as ListBrewCommandRuns but formatted as CSV
-		ListBrewCommandRunsCSV(ctx context.Context, brewCommandLabel string) ([]byte, error)
+		ListBrewCommandRunsCSV(ctx context.Context, brewCommandLabel string) ([]byte, *interfaces.Response, error)
 	}
 
 	// Service handles communication with the brew commands
@@ -59,15 +59,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 
 // ListBrewCommands retrieves all brew commands in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brew_commands.json
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: application/json" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/brew_commands.json"
-func (s *Service) ListBrewCommands(ctx context.Context) (*BrewCommandsResponse, error) {
+func (s *Service) ListBrewCommands(ctx context.Context) (*BrewCommandsResponse, *interfaces.Response, error) {
 	endpoint := EndpointBrewCommandsJSON
 
 	headers := map[string]string{
@@ -78,17 +70,17 @@ func (s *Service) ListBrewCommands(ctx context.Context) (*BrewCommandsResponse, 
 	queryParams := make(map[string]string)
 
 	var result BrewCommandsResponse
-	err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
+	resp, err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return &result, nil
+	return &result, resp, nil
 }
 
 // ListBrewCommandsCSV retrieves all brew commands in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brew_commands.csv
-func (s *Service) ListBrewCommandsCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListBrewCommandsCSV(ctx context.Context) ([]byte, *interfaces.Response, error) {
 	endpoint := EndpointBrewCommandsCSV
 
 	headers := map[string]string{
@@ -97,12 +89,12 @@ func (s *Service) ListBrewCommandsCSV(ctx context.Context) ([]byte, error) {
 
 	queryParams := make(map[string]string)
 
-	csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return csvData, nil
+	return csvData, resp, nil
 }
 
 // CreateBrewCommand creates a new brew command
@@ -112,17 +104,7 @@ func (s *Service) ListBrewCommandsCSV(ctx context.Context) ([]byte, error) {
 //   - 201: Brew Command created successfully
 //   - 403: On a Free tier plan (requires upgrade)
 //   - 422: Validation error (e.g., "Arguments cannot include `&&`")
-//
-// Example cURL:
-//
-//	curl -X POST \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: application/json" \
-//	  -H "Content-Type: application/json" \
-//	  -d '{"arguments":"install wget"}' \
-//	  "https://console.workbrew.com/workspaces/{workspace}/brew_commands.json"
-func (s *Service) CreateBrewCommand(ctx context.Context, request *CreateBrewCommandRequest) (*CreateBrewCommandResponse, error) {
+func (s *Service) CreateBrewCommand(ctx context.Context, request *CreateBrewCommandRequest) (*CreateBrewCommandResponse, *interfaces.Response, error) {
 	endpoint := EndpointBrewCommandsJSON
 
 	headers := map[string]string{
@@ -131,19 +113,19 @@ func (s *Service) CreateBrewCommand(ctx context.Context, request *CreateBrewComm
 	}
 
 	var result CreateBrewCommandResponse
-	err := s.client.Post(ctx, endpoint, request, headers, &result)
+	resp, err := s.client.Post(ctx, endpoint, request, headers, &result)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return &result, nil
+	return &result, resp, nil
 }
 
 // ListBrewCommandRuns retrieves all runs for a specific brew command in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brew_commands/{brew_command_label}/runs.json
-func (s *Service) ListBrewCommandRuns(ctx context.Context, brewCommandLabel string) (*BrewCommandRunsResponse, error) {
+func (s *Service) ListBrewCommandRuns(ctx context.Context, brewCommandLabel string) (*BrewCommandRunsResponse, *interfaces.Response, error) {
 	if brewCommandLabel == "" {
-		return nil, fmt.Errorf("brew command label is required")
+		return nil, nil, fmt.Errorf("brew command label is required")
 	}
 
 	endpoint := fmt.Sprintf(EndpointBrewCommandRunsJSONFormat, brewCommandLabel)
@@ -156,19 +138,19 @@ func (s *Service) ListBrewCommandRuns(ctx context.Context, brewCommandLabel stri
 	queryParams := make(map[string]string)
 
 	var result BrewCommandRunsResponse
-	err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
+	resp, err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return &result, nil
+	return &result, resp, nil
 }
 
 // ListBrewCommandRunsCSV retrieves all runs for a specific brew command in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brew_commands/{brew_command_label}/runs.csv
-func (s *Service) ListBrewCommandRunsCSV(ctx context.Context, brewCommandLabel string) ([]byte, error) {
+func (s *Service) ListBrewCommandRunsCSV(ctx context.Context, brewCommandLabel string) ([]byte, *interfaces.Response, error) {
 	if brewCommandLabel == "" {
-		return nil, fmt.Errorf("brew command label is required")
+		return nil, nil, fmt.Errorf("brew command label is required")
 	}
 
 	endpoint := fmt.Sprintf(EndpointBrewCommandRunsCSVFormat, brewCommandLabel)
@@ -179,10 +161,10 @@ func (s *Service) ListBrewCommandRunsCSV(ctx context.Context, brewCommandLabel s
 
 	queryParams := make(map[string]string)
 
-	csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return csvData, nil
+	return csvData, resp, nil
 }

@@ -37,7 +37,7 @@ func TestListLicenses_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListLicenses(ctx)
+	result, _, err := service.ListLicenses(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -72,7 +72,7 @@ func TestListLicenses_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListLicenses(ctx)
+	result, _, err := service.ListLicenses(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -88,7 +88,7 @@ func TestListLicensesCSV_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListLicensesCSV(ctx)
+	csvData, _, err := service.ListLicensesCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -114,7 +114,7 @@ func TestListLicensesCSV_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListLicensesCSV(ctx)
+	result, _, err := service.ListLicensesCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

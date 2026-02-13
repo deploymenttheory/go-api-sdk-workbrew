@@ -37,7 +37,7 @@ func TestListVulnerabilities_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListVulnerabilities(ctx)
+	result, _, err := service.ListVulnerabilities(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -80,7 +80,7 @@ func TestListVulnerabilities_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListVulnerabilities(ctx)
+	result, _, err := service.ListVulnerabilities(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -96,7 +96,7 @@ func TestListVulnerabilities_Forbidden(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListVulnerabilities(ctx)
+	result, _, err := service.ListVulnerabilities(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -112,7 +112,7 @@ func TestListVulnerabilitiesCSV_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListVulnerabilitiesCSV(ctx)
+	csvData, _, err := service.ListVulnerabilitiesCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -138,7 +138,7 @@ func TestListVulnerabilitiesCSV_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListVulnerabilitiesCSV(ctx)
+	result, _, err := service.ListVulnerabilitiesCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

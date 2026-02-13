@@ -11,10 +11,12 @@ import (
 
 // Client represents the HTTP client for Workbrew API
 type Client struct {
-	client     *resty.Client
-	logger     *zap.Logger
-	authConfig *AuthConfig
-	BaseURL    string
+	client        *resty.Client
+	logger        *zap.Logger
+	authConfig    *AuthConfig
+	BaseURL       string
+	globalHeaders map[string]string
+	userAgent     string
 }
 
 // NewClient creates a new Workbrew API client
@@ -31,20 +33,25 @@ func NewClient(apiKey string, workspaceName string, options ...ClientOption) (*C
 		APIVersion: DefaultAPIVersion,
 	}
 
+	// Format: "go-api-sdk-workbrew/1.0.0"
+	userAgent := fmt.Sprintf("%s/%s", UserAgentBase, Version)
+
 	// Create resty client
 	restyClient := resty.New()
 	restyClient.SetTimeout(DefaultTimeout * time.Second)
 	restyClient.SetRetryCount(MaxRetries)
 	restyClient.SetRetryWaitTime(RetryWaitTime * time.Second)
 	restyClient.SetRetryMaxWaitTime(RetryMaxWaitTime * time.Second)
-	restyClient.SetHeader("User-Agent", UserAgent)
+	restyClient.SetHeader("User-Agent", userAgent)
 
 	// Create client instance
 	client := &Client{
-		client:     restyClient,
-		logger:     logger,
-		authConfig: authConfig,
-		BaseURL:    DefaultBaseURL,
+		client:        restyClient,
+		logger:        logger,
+		authConfig:    authConfig,
+		BaseURL:       DefaultBaseURL,
+		globalHeaders: make(map[string]string),
+		userAgent:     userAgent,
 	}
 
 	// Apply any additional options

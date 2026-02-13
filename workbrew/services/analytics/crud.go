@@ -14,12 +14,12 @@ type (
 		// ListAnalytics returns a list of analytics data showing command usage statistics per device
 		//
 		// Returns analytics records with device, command, last run timestamp, and count information
-		ListAnalytics(ctx context.Context) (*AnalyticsResponse, error)
+		ListAnalytics(ctx context.Context) (*AnalyticsResponse, *interfaces.Response, error)
 
 		// ListAnalyticsCSV returns a list of analytics data in CSV format
 		//
 		// Returns the same analytics data as ListAnalytics but formatted as CSV
-		ListAnalyticsCSV(ctx context.Context) ([]byte, error)
+		ListAnalyticsCSV(ctx context.Context) ([]byte, *interfaces.Response, error)
 	}
 
 	// Service handles communication with the analytics
@@ -43,15 +43,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 
 // ListAnalytics retrieves all analytics in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/analytics.json
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: application/json" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/analytics.json"
-func (s *Service) ListAnalytics(ctx context.Context) (*AnalyticsResponse, error) {
+func (s *Service) ListAnalytics(ctx context.Context) (*AnalyticsResponse, *interfaces.Response, error) {
 	endpoint := EndpointAnalyticsJSON
 
 	headers := map[string]string{
@@ -62,25 +54,17 @@ func (s *Service) ListAnalytics(ctx context.Context) (*AnalyticsResponse, error)
 	queryParams := make(map[string]string)
 
 	var result AnalyticsResponse
-	err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
+	resp, err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return &result, nil
+	return &result, resp, nil
 }
 
 // ListAnalyticsCSV retrieves all analytics in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/analytics.csv
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: text/csv" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/analytics.csv"
-func (s *Service) ListAnalyticsCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListAnalyticsCSV(ctx context.Context) ([]byte, *interfaces.Response, error) {
 	endpoint := EndpointAnalyticsCSV
 
 	headers := map[string]string{
@@ -89,10 +73,10 @@ func (s *Service) ListAnalyticsCSV(ctx context.Context) ([]byte, error) {
 
 	queryParams := make(map[string]string)
 
-	csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return csvData, nil
+	return csvData, resp, nil
 }

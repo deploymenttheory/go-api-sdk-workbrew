@@ -36,7 +36,7 @@ func main() {
 	deviceGroupsService := devicegroups.NewService(httpClient)
 
 	ctx := context.Background()
-	groups, err := deviceGroupsService.ListDeviceGroups(ctx)
+	groups, _, err := deviceGroupsService.ListDeviceGroups(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list device groups: %v", err)
 	}

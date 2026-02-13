@@ -37,7 +37,7 @@ func TestListBrewTaps_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListBrewTaps(ctx)
+	result, _, err := service.ListBrewTaps(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -77,7 +77,7 @@ func TestListBrewTaps_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListBrewTaps(ctx)
+	result, _, err := service.ListBrewTaps(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -93,7 +93,7 @@ func TestListBrewTapsCSV_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListBrewTapsCSV(ctx)
+	csvData, _, err := service.ListBrewTapsCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -117,7 +117,7 @@ func TestListBrewTapsCSV_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListBrewTapsCSV(ctx)
+	result, _, err := service.ListBrewTapsCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

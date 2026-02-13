@@ -13,8 +13,8 @@ const (
 	// AuthorizationHeader is the header name for the authorization token
 	AuthorizationHeader = "Authorization"
 
-	// UserAgent is the user agent string for API requests
-	UserAgent = "go-api-sdk-workbrew/1.0.0"
+	// UserAgentBase is the base user agent string prefix
+	UserAgentBase = "go-api-sdk-workbrew"
 
 	// DefaultTimeout is the default HTTP client timeout in seconds
 	DefaultTimeout = 120
@@ -33,4 +33,10 @@ const (
 const (
 	FormatJSON = "json"
 	FormatCSV  = "csv"
+)
+
+// HTTP headers
+const (
+	ContentTypeJSON = "application/json"
+	AcceptJSON      = "application/json"
 )

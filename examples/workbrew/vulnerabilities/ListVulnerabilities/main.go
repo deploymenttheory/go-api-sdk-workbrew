@@ -36,7 +36,7 @@ func main() {
 	vulnerabilitiesService := vulnerabilities.NewService(httpClient)
 
 	ctx := context.Background()
-	vulnList, err := vulnerabilitiesService.ListVulnerabilities(ctx)
+	vulnList, _, err := vulnerabilitiesService.ListVulnerabilities(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list vulnerabilities: %v", err)
 	}

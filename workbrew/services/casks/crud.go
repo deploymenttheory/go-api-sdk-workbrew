@@ -14,12 +14,12 @@ type (
 		// ListCasks returns a list of Casks
 		//
 		// Returns installed Homebrew casks with their names, assigned devices, outdated status, deprecation info, and versions.
-		ListCasks(ctx context.Context) (*CasksResponse, error)
+		ListCasks(ctx context.Context) (*CasksResponse, *interfaces.Response, error)
 
 		// ListCasksCSV returns a list of Casks in CSV format
 		//
 		// Returns cask data as CSV with columns: name, devices, outdated, deprecated, homebrew_cask_version.
-		ListCasksCSV(ctx context.Context) ([]byte, error)
+		ListCasksCSV(ctx context.Context) ([]byte, *interfaces.Response, error)
 	}
 
 	// Service handles communication with the casks
@@ -41,15 +41,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 
 // ListCasks retrieves all casks in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/casks.json
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: application/json" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/casks.json"
-func (s *Service) ListCasks(ctx context.Context) (*CasksResponse, error) {
+func (s *Service) ListCasks(ctx context.Context) (*CasksResponse, *interfaces.Response, error) {
 	endpoint := EndpointCasksJSON
 
 	headers := map[string]string{
@@ -60,25 +52,17 @@ func (s *Service) ListCasks(ctx context.Context) (*CasksResponse, error) {
 	queryParams := make(map[string]string)
 
 	var result CasksResponse
-	err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
+	resp, err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return &result, nil
+	return &result, resp, nil
 }
 
 // ListCasksCSV retrieves all casks in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/casks.csv
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: text/csv" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/casks.csv"
-func (s *Service) ListCasksCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListCasksCSV(ctx context.Context) ([]byte, *interfaces.Response, error) {
 	endpoint := EndpointCasksCSV
 
 	headers := map[string]string{
@@ -87,10 +71,10 @@ func (s *Service) ListCasksCSV(ctx context.Context) ([]byte, error) {
 
 	queryParams := make(map[string]string)
 
-	csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return csvData, nil
+	return csvData, resp, nil
 }

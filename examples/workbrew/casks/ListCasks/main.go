@@ -36,7 +36,7 @@ func main() {
 	casksService := casks.NewService(httpClient)
 
 	ctx := context.Background()
-	casksList, err := casksService.ListCasks(ctx)
+	casksList, _, err := casksService.ListCasks(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list casks: %v", err)
 	}

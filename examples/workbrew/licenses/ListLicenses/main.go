@@ -36,7 +36,7 @@ func main() {
 	licensesService := licenses.NewService(httpClient)
 
 	ctx := context.Background()
-	licensesList, err := licensesService.ListLicenses(ctx)
+	licensesList, _, err := licensesService.ListLicenses(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list licenses: %v", err)
 	}

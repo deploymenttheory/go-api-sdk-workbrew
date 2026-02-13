@@ -1,6 +1,10 @@
 package client
 
 import (
+	"crypto/tls"
+	"fmt"
+	"maps"
+	"net/http"
 	"time"
 
 	"go.uber.org/zap"
@@ -67,7 +71,182 @@ func WithDebug() ClientOption {
 func WithUserAgent(userAgent string) ClientOption {
 	return func(c *Client) error {
 		c.client.SetHeader("User-Agent", userAgent)
+		c.userAgent = userAgent
 		c.logger.Info("User agent configured", zap.String("user_agent", userAgent))
 		return nil
+	}
+}
+
+// WithCustomAgent allows appending a custom identifier to the default user agent
+// Format: "go-api-sdk-workbrew/1.0.0; <customAgent>"
+func WithCustomAgent(customAgent string) ClientOption {
+	return func(c *Client) error {
+		enhancedUA := fmt.Sprintf("%s/%s; %s", UserAgentBase, Version, customAgent)
+		c.client.SetHeader("User-Agent", enhancedUA)
+		c.userAgent = enhancedUA
+		c.logger.Info("Custom agent configured", zap.String("user_agent", enhancedUA))
+		return nil
+	}
+}
+
+// WithGlobalHeader sets a global header that will be included in all requests
+// Per-request headers will override global headers with the same key
+func WithGlobalHeader(key, value string) ClientOption {
+	return func(c *Client) error {
+		c.globalHeaders[key] = value
+		c.logger.Info("Global header configured", zap.String("key", key), zap.String("value", value))
+		return nil
+	}
+}
+
+// WithGlobalHeaders sets multiple global headers at once
+func WithGlobalHeaders(headers map[string]string) ClientOption {
+	return func(c *Client) error {
+		maps.Copy(c.globalHeaders, headers)
+		c.logger.Info("Multiple global headers configured", zap.Int("count", len(headers)))
+		return nil
+	}
+}
+
+// WithProxy sets an HTTP proxy for all requests
+// Example: "http://proxy.company.com:8080" or "socks5://127.0.0.1:1080"
+func WithProxy(proxyURL string) ClientOption {
+	return func(c *Client) error {
+		c.client.SetProxy(proxyURL)
+		c.logger.Info("Proxy configured", zap.String("proxy", proxyURL))
+		return nil
+	}
+}
+
+// WithTLSClientConfig sets custom TLS configuration
+// Use this for custom certificate validation, minimum TLS version, etc.
+func WithTLSClientConfig(tlsConfig *tls.Config) ClientOption {
+	return func(c *Client) error {
+		c.client.SetTLSClientConfig(tlsConfig)
+		c.logger.Info("TLS client config configured",
+			zap.Uint16("min_version", tlsConfig.MinVersion),
+			zap.Bool("insecure_skip_verify", tlsConfig.InsecureSkipVerify))
+		return nil
+	}
+}
+
+// WithClientCertificate sets a client certificate for mutual TLS authentication
+// Loads certificate from PEM-encoded files
+func WithClientCertificate(certFile, keyFile string) ClientOption {
+	return func(c *Client) error {
+		c.client.SetCertificateFromFile(certFile, keyFile)
+		c.logger.Info("Client certificate configured",
+			zap.String("cert_file", certFile),
+			zap.String("key_file", keyFile))
+		return nil
+	}
+}
+
+// WithClientCertificateFromString sets a client certificate from PEM-encoded strings
+func WithClientCertificateFromString(certPEM, keyPEM string) ClientOption {
+	return func(c *Client) error {
+		c.client.SetCertificateFromString(certPEM, keyPEM)
+		c.logger.Info("Client certificate configured from string")
+		return nil
+	}
+}
+
+// WithRootCertificates adds custom root CA certificates for server validation
+// Useful for private CAs or self-signed certificates
+func WithRootCertificates(pemFilePaths ...string) ClientOption {
+	return func(c *Client) error {
+		c.client.SetClientRootCertificates(pemFilePaths...)
+		c.logger.Info("Root certificates configured", zap.Int("count", len(pemFilePaths)))
+		return nil
+	}
+}
+
+// WithRootCertificateFromString adds a custom root CA certificate from PEM string
+func WithRootCertificateFromString(pemContent string) ClientOption {
+	return func(c *Client) error {
+		c.client.SetClientRootCertificateFromString(pemContent)
+		c.logger.Info("Root certificate configured from string")
+		return nil
+	}
+}
+
+// WithTransport sets a custom HTTP transport (http.RoundTripper)
+// Use this for advanced transport customization beyond TLS/proxy
+func WithTransport(transport http.RoundTripper) ClientOption {
+	return func(c *Client) error {
+		c.client.SetTransport(transport)
+		c.logger.Info("Custom transport configured")
+		return nil
+	}
+}
+
+// WithInsecureSkipVerify disables TLS certificate verification (USE WITH CAUTION)
+// This should ONLY be used for testing/development with self-signed certificates
+func WithInsecureSkipVerify() ClientOption {
+	return func(c *Client) error {
+		tlsConfig := &tls.Config{
+			InsecureSkipVerify: true,
+		}
+		c.client.SetTLSClientConfig(tlsConfig)
+		c.logger.Warn("TLS certificate verification DISABLED - use only for testing")
+		return nil
+	}
+}
+
+// WithMinTLSVersion sets the minimum TLS version for connections
+// Common values: tls.VersionTLS12, tls.VersionTLS13
+func WithMinTLSVersion(minVersion uint16) ClientOption {
+	return func(c *Client) error {
+		tlsConfig := &tls.Config{
+			MinVersion: minVersion,
+		}
+		c.client.SetTLSClientConfig(tlsConfig)
+
+		versionName := "unknown"
+		switch minVersion {
+		case tls.VersionTLS10:
+			versionName = "TLS 1.0"
+		case tls.VersionTLS11:
+			versionName = "TLS 1.1"
+		case tls.VersionTLS12:
+			versionName = "TLS 1.2"
+		case tls.VersionTLS13:
+			versionName = "TLS 1.3"
+		}
+
+		c.logger.Info("Minimum TLS version configured",
+			zap.String("version", versionName),
+			zap.Uint16("version_code", minVersion))
+		return nil
+	}
+}
+
+// WithTracing enables OpenTelemetry tracing for all HTTP requests.
+// This wraps the HTTP client transport with automatic instrumentation.
+//
+// Example usage:
+//
+//	client, err := client.NewClient(apiKey, workspaceName,
+//	    client.WithTracing(nil), // Uses default config with global tracer provider
+//	)
+//
+// Or with custom configuration:
+//
+//	otelConfig := &client.OTelConfig{
+//	    TracerProvider: myTracerProvider,
+//	    ServiceName:    "my-workbrew-client",
+//	}
+//	client, err := client.NewClient(apiKey, workspaceName,
+//	    client.WithTracing(otelConfig),
+//	)
+//
+// The instrumentation automatically captures:
+// - HTTP method, URL, status code
+// - Request/response timing
+// - Error details
+// - All OpenTelemetry semantic conventions for HTTP
+func WithTracing(config *OTelConfig) ClientOption {
+	return func(c *Client) error {
+		return c.EnableTracing(config)
 	}
 }

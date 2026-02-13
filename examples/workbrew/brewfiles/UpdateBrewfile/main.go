@@ -42,7 +42,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	response, err := brewfilesService.UpdateBrewfile(ctx, brewfileLabel, request)
+	response, _, err := brewfilesService.UpdateBrewfile(ctx, brewfileLabel, request)
 	if err != nil {
 		log.Fatalf("Failed to update brewfile: %v", err)
 	}

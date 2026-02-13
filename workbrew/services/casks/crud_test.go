@@ -37,7 +37,7 @@ func TestListCasks_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListCasks(ctx)
+	result, _, err := service.ListCasks(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -80,7 +80,7 @@ func TestListCasks_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListCasks(ctx)
+	result, _, err := service.ListCasks(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -96,7 +96,7 @@ func TestListCasksCSV_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListCasksCSV(ctx)
+	csvData, _, err := service.ListCasksCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -119,7 +119,7 @@ func TestListCasksCSV_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListCasksCSV(ctx)
+	result, _, err := service.ListCasksCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

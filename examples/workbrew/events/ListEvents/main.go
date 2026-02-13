@@ -41,7 +41,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	eventsList, err := eventsService.ListEvents(ctx, opts)
+	eventsList, _, err := eventsService.ListEvents(ctx, opts)
 	if err != nil {
 		log.Fatalf("Failed to list events: %v", err)
 	}

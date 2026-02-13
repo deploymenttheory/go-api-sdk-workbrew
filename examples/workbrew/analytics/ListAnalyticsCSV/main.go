@@ -40,7 +40,7 @@ func main() {
 
 	// List analytics as CSV
 	ctx := context.Background()
-	csvData, err := analyticsService.ListAnalyticsCSV(ctx)
+	csvData, _, err := analyticsService.ListAnalyticsCSV(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list analytics CSV: %v", err)
 	}

@@ -42,7 +42,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	csvData, err := eventsService.ListEventsCSV(ctx, opts)
+	csvData, _, err := eventsService.ListEventsCSV(ctx, opts)
 	if err != nil {
 		log.Fatalf("Failed to list events CSV: %v", err)
 	}

@@ -37,7 +37,7 @@ func TestListBrewConfigurations_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListBrewConfigurations(ctx)
+	result, _, err := service.ListBrewConfigurations(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -61,7 +61,7 @@ func TestListBrewConfigurations_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListBrewConfigurations(ctx)
+	result, _, err := service.ListBrewConfigurations(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -75,7 +75,7 @@ func TestListBrewConfigurationsCSV_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListBrewConfigurationsCSV(ctx)
+	csvData, _, err := service.ListBrewConfigurationsCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)

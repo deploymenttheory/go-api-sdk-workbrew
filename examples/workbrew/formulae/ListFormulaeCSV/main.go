@@ -36,7 +36,7 @@ func main() {
 	formulaeService := formulae.NewService(httpClient)
 
 	ctx := context.Background()
-	csvData, err := formulaeService.ListFormulaeCSV(ctx)
+	csvData, _, err := formulaeService.ListFormulaeCSV(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list formulae CSV: %v", err)
 	}

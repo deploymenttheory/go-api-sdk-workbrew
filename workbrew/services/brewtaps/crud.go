@@ -14,12 +14,12 @@ type (
 		// ListBrewTaps returns a list of Taps
 		//
 		// Returns Homebrew taps with their names, assigned devices, installed formulae/casks counts, and available packages.
-		ListBrewTaps(ctx context.Context) (*BrewTapsResponse, error)
+		ListBrewTaps(ctx context.Context) (*BrewTapsResponse, *interfaces.Response, error)
 
 		// ListBrewTapsCSV returns a list of Taps in CSV format
 		//
 		// Returns tap data as CSV with columns: tap, devices, formulae_installed, casks_installed, available_packages.
-		ListBrewTapsCSV(ctx context.Context) ([]byte, error)
+		ListBrewTapsCSV(ctx context.Context) ([]byte, *interfaces.Response, error)
 	}
 
 	// Service handles communication with the brew taps
@@ -41,15 +41,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 
 // ListBrewTaps retrieves all brew taps in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brew_taps.json
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: application/json" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/brew_taps.json"
-func (s *Service) ListBrewTaps(ctx context.Context) (*BrewTapsResponse, error) {
+func (s *Service) ListBrewTaps(ctx context.Context) (*BrewTapsResponse, *interfaces.Response, error) {
 	endpoint := EndpointBrewTapsJSON
 
 	headers := map[string]string{
@@ -60,25 +52,17 @@ func (s *Service) ListBrewTaps(ctx context.Context) (*BrewTapsResponse, error) {
 	queryParams := make(map[string]string)
 
 	var result BrewTapsResponse
-	err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
+	resp, err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return &result, nil
+	return &result, resp, nil
 }
 
 // ListBrewTapsCSV retrieves all brew taps in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/brew_taps.csv
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: text/csv" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/brew_taps.csv"
-func (s *Service) ListBrewTapsCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListBrewTapsCSV(ctx context.Context) ([]byte, *interfaces.Response, error) {
 	endpoint := EndpointBrewTapsCSV
 
 	headers := map[string]string{
@@ -87,10 +71,10 @@ func (s *Service) ListBrewTapsCSV(ctx context.Context) ([]byte, error) {
 
 	queryParams := make(map[string]string)
 
-	csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return csvData, nil
+	return csvData, resp, nil
 }

@@ -36,7 +36,7 @@ func main() {
 	devicesService := devices.NewService(httpClient)
 
 	ctx := context.Background()
-	devicesList, err := devicesService.ListDevices(ctx)
+	devicesList, _, err := devicesService.ListDevices(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list devices: %v", err)
 	}

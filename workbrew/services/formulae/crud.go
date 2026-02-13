@@ -15,13 +15,13 @@ type (
 		//
 		// Returns installed Homebrew formulae with names, assigned devices, outdated status, installation type (on request/dependency),
 		// known vulnerabilities, deprecation status, licenses, and Homebrew core versions.
-		ListFormulae(ctx context.Context) (*FormulaeResponse, error)
+		ListFormulae(ctx context.Context) (*FormulaeResponse, *interfaces.Response, error)
 
 		// ListFormulaeCSV returns a list of Formulae in CSV format
 		//
-		// Returns formulae data as CSV with columns: name, devices, outdated, installed_on_request, installed_as_dependency, 
+		// Returns formulae data as CSV with columns: name, devices, outdated, installed_on_request, installed_as_dependency,
 		// vulnerabilities, deprecated, license, homebrew_core_version.
-		ListFormulaeCSV(ctx context.Context) ([]byte, error)
+		ListFormulaeCSV(ctx context.Context) ([]byte, *interfaces.Response, error)
 	}
 
 	// Service handles communication with the formulae
@@ -43,15 +43,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 
 // ListFormulae retrieves all formulae in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/formulae.json
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: application/json" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/formulae.json"
-func (s *Service) ListFormulae(ctx context.Context) (*FormulaeResponse, error) {
+func (s *Service) ListFormulae(ctx context.Context) (*FormulaeResponse, *interfaces.Response, error) {
 	endpoint := EndpointFormulaeJSON
 
 	headers := map[string]string{
@@ -62,25 +54,17 @@ func (s *Service) ListFormulae(ctx context.Context) (*FormulaeResponse, error) {
 	queryParams := make(map[string]string)
 
 	var result FormulaeResponse
-	err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
+	resp, err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return &result, nil
+	return &result, resp, nil
 }
 
 // ListFormulaeCSV retrieves all formulae in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/formulae.csv
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: text/csv" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/formulae.csv"
-func (s *Service) ListFormulaeCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListFormulaeCSV(ctx context.Context) ([]byte, *interfaces.Response, error) {
 	endpoint := EndpointFormulaeCSV
 
 	headers := map[string]string{
@@ -89,10 +73,10 @@ func (s *Service) ListFormulaeCSV(ctx context.Context) ([]byte, error) {
 
 	queryParams := make(map[string]string)
 
-	csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return csvData, nil
+	return csvData, resp, nil
 }

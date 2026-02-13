@@ -36,7 +36,7 @@ func main() {
 	formulaeService := formulae.NewService(httpClient)
 
 	ctx := context.Background()
-	formulaeList, err := formulaeService.ListFormulae(ctx)
+	formulaeList, _, err := formulaeService.ListFormulae(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list formulae: %v", err)
 	}

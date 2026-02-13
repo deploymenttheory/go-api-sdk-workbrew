@@ -46,7 +46,7 @@ func TestListAnalytics_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListAnalytics(ctx)
+	result, _, err := service.ListAnalytics(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -72,7 +72,7 @@ func TestListAnalytics_VerifyAllFields(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListAnalytics(ctx)
+	result, _, err := service.ListAnalytics(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -93,7 +93,7 @@ func TestListAnalytics_VerifyDevices(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListAnalytics(ctx)
+	result, _, err := service.ListAnalytics(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -115,7 +115,7 @@ func TestListAnalytics_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListAnalytics(ctx)
+	result, _, err := service.ListAnalytics(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -131,7 +131,7 @@ func TestListAnalyticsCSV_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListAnalyticsCSV(ctx)
+	csvData, _, err := service.ListAnalyticsCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -153,7 +153,7 @@ func TestListAnalyticsCSV_VerifyFormat(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListAnalyticsCSV(ctx)
+	csvData, _, err := service.ListAnalyticsCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -174,7 +174,7 @@ func TestListAnalyticsCSV_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListAnalyticsCSV(ctx)
+	result, _, err := service.ListAnalyticsCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -192,8 +192,8 @@ func TestAnalytics_HTTPMockCallCounts(t *testing.T) {
 	ctx := context.Background()
 
 	// Make multiple calls
-	_, err1 := service.ListAnalytics(ctx)
-	_, err2 := service.ListAnalyticsCSV(ctx)
+	_, _, err1 := service.ListAnalytics(ctx)
+	_, _, err2 := service.ListAnalyticsCSV(ctx)
 
 	require.NoError(t, err1)
 	require.NoError(t, err2)
@@ -211,12 +211,12 @@ func TestAnalytics_MultipleSequentialCalls(t *testing.T) {
 	ctx := context.Background()
 
 	// First call
-	result1, err1 := service.ListAnalytics(ctx)
+	result1, _, err1 := service.ListAnalytics(ctx)
 	require.NoError(t, err1)
 	require.NotNil(t, result1)
 
 	// Second call should return same data
-	result2, err2 := service.ListAnalytics(ctx)
+	result2, _, err2 := service.ListAnalytics(ctx)
 	require.NoError(t, err2)
 	require.NotNil(t, result2)
 

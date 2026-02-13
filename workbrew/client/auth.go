@@ -31,11 +31,9 @@ func SetupAuthentication(client *resty.Client, authConfig *AuthConfig, logger *z
 		return fmt.Errorf("authentication validation failed: %w", err)
 	}
 
-	// Set the bearer token
 	client.SetAuthScheme("Bearer")
 	client.SetAuthToken(authConfig.APIKey)
 
-	// Set API version header if specified
 	apiVersion := authConfig.APIVersion
 	if apiVersion == "" {
 		apiVersion = DefaultAPIVersion

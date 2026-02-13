@@ -40,7 +40,7 @@ func main() {
 
 	// List analytics
 	ctx := context.Background()
-	analyticsData, err := analyticsService.ListAnalytics(ctx)
+	analyticsData, _, err := analyticsService.ListAnalytics(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list analytics: %v", err)
 	}

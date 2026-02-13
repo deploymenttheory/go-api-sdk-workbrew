@@ -15,13 +15,13 @@ type (
 		//
 		// Returns audit log events with IDs, event types, timestamps, actor information, and target details.
 		// Supports filtering by actor type (user, system, or all) via query options.
-		ListEvents(ctx context.Context, opts *RequestQueryOptions) (*EventsResponse, error)
+		ListEvents(ctx context.Context, opts *RequestQueryOptions) (*EventsResponse, *interfaces.Response, error)
 
 		// ListEventsCSV returns audit log events as CSV
 		//
 		// Returns audit log event data as CSV with columns: id, event_type, occurred_at, actor_id, actor_type, target_id, target_type, target_identifier.
 		// Supports filtering by actor type and optional download parameter via query options.
-		ListEventsCSV(ctx context.Context, opts *RequestQueryOptions) ([]byte, error)
+		ListEventsCSV(ctx context.Context, opts *RequestQueryOptions) ([]byte, *interfaces.Response, error)
 	}
 
 	// Service handles communication with the events
@@ -46,15 +46,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 //
 // Parameters:
 //   - opts: Optional query parameters (filter by actor type: user, system, all)
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: application/json" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/events.json?filter=user"
-func (s *Service) ListEvents(ctx context.Context, opts *RequestQueryOptions) (*EventsResponse, error) {
+func (s *Service) ListEvents(ctx context.Context, opts *RequestQueryOptions) (*EventsResponse, *interfaces.Response, error) {
 	endpoint := EndpointEventsJSON
 
 	headers := map[string]string{
@@ -71,12 +63,12 @@ func (s *Service) ListEvents(ctx context.Context, opts *RequestQueryOptions) (*E
 		Build()
 
 	var result EventsResponse
-	err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
+	resp, err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return &result, nil
+	return &result, resp, nil
 }
 
 // ListEventsCSV retrieves all events in CSV format
@@ -84,15 +76,7 @@ func (s *Service) ListEvents(ctx context.Context, opts *RequestQueryOptions) (*E
 //
 // Parameters:
 //   - opts: Optional query parameters (filter by actor type, download flag)
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: text/csv" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/events.csv?filter=user&download=1"
-func (s *Service) ListEventsCSV(ctx context.Context, opts *RequestQueryOptions) ([]byte, error) {
+func (s *Service) ListEventsCSV(ctx context.Context, opts *RequestQueryOptions) ([]byte, *interfaces.Response, error) {
 	endpoint := EndpointEventsCSV
 
 	headers := map[string]string{
@@ -109,10 +93,10 @@ func (s *Service) ListEventsCSV(ctx context.Context, opts *RequestQueryOptions) 
 	}
 	queryParams := qb.Build()
 
-	csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return csvData, nil
+	return csvData, resp, nil
 }

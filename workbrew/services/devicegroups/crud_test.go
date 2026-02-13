@@ -37,7 +37,7 @@ func TestListDeviceGroups_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListDeviceGroups(ctx)
+	result, _, err := service.ListDeviceGroups(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -69,7 +69,7 @@ func TestListDeviceGroups_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListDeviceGroups(ctx)
+	result, _, err := service.ListDeviceGroups(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -85,7 +85,7 @@ func TestListDeviceGroupsCSV_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListDeviceGroupsCSV(ctx)
+	csvData, _, err := service.ListDeviceGroupsCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -108,7 +108,7 @@ func TestListDeviceGroupsCSV_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListDeviceGroupsCSV(ctx)
+	result, _, err := service.ListDeviceGroupsCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

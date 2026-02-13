@@ -47,7 +47,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	response, err := brewfilesService.CreateBrewfile(ctx, request)
+	response, _, err := brewfilesService.CreateBrewfile(ctx, request)
 	if err != nil {
 		log.Fatalf("Failed to create brewfile: %v", err)
 	}

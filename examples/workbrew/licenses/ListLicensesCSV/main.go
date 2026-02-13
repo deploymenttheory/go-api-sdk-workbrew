@@ -36,7 +36,7 @@ func main() {
 	licensesService := licenses.NewService(httpClient)
 
 	ctx := context.Background()
-	csvData, err := licensesService.ListLicensesCSV(ctx)
+	csvData, _, err := licensesService.ListLicensesCSV(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list licenses CSV: %v", err)
 	}

@@ -36,7 +36,7 @@ func main() {
 	brewTapsService := brewtaps.NewService(httpClient)
 
 	ctx := context.Background()
-	taps, err := brewTapsService.ListBrewTaps(ctx)
+	taps, _, err := brewTapsService.ListBrewTaps(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list brew taps: %v", err)
 	}

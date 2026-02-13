@@ -37,7 +37,7 @@ func TestListBrewfiles_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListBrewfiles(ctx)
+	result, _, err := service.ListBrewfiles(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -71,7 +71,7 @@ func TestListBrewfiles_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListBrewfiles(ctx)
+	result, _, err := service.ListBrewfiles(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -87,7 +87,7 @@ func TestListBrewfilesCSV_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	csvData, err := service.ListBrewfilesCSV(ctx)
+	csvData, _, err := service.ListBrewfilesCSV(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -110,7 +110,7 @@ func TestListBrewfilesCSV_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListBrewfilesCSV(ctx)
+	result, _, err := service.ListBrewfilesCSV(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -131,7 +131,7 @@ func TestCreateBrewfile_Success(t *testing.T) {
 		Content: "brew \"wget\"",
 	}
 
-	result, err := service.CreateBrewfile(ctx, request)
+	result, _, err := service.CreateBrewfile(ctx, request)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -154,7 +154,7 @@ func TestCreateBrewfile_WithDevices(t *testing.T) {
 		DeviceSerialNumbers: &deviceSerials,
 	}
 
-	result, err := service.CreateBrewfile(ctx, request)
+	result, _, err := service.CreateBrewfile(ctx, request)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -177,7 +177,7 @@ func TestCreateBrewfile_WithDeviceGroup(t *testing.T) {
 		DeviceGroupID: &deviceGroupID,
 	}
 
-	result, err := service.CreateBrewfile(ctx, request)
+	result, _, err := service.CreateBrewfile(ctx, request)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -198,7 +198,7 @@ func TestCreateBrewfile_Unauthorized(t *testing.T) {
 		Content: "brew \"wget\"",
 	}
 
-	result, err := service.CreateBrewfile(ctx, request)
+	result, _, err := service.CreateBrewfile(ctx, request)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -219,7 +219,7 @@ func TestCreateBrewfile_Forbidden(t *testing.T) {
 		Content: "brew \"wget\"",
 	}
 
-	result, err := service.CreateBrewfile(ctx, request)
+	result, _, err := service.CreateBrewfile(ctx, request)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -239,7 +239,7 @@ func TestUpdateBrewfile_Success(t *testing.T) {
 		Content: "brew \"wget\"\nbrew \"htop\"",
 	}
 
-	result, err := service.UpdateBrewfile(ctx, "my-brewfile", request)
+	result, _, err := service.UpdateBrewfile(ctx, "my-brewfile", request)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -256,7 +256,7 @@ func TestUpdateBrewfile_EmptyLabel(t *testing.T) {
 		Content: "brew \"wget\"",
 	}
 
-	result, err := service.UpdateBrewfile(ctx, "", request)
+	result, _, err := service.UpdateBrewfile(ctx, "", request)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -276,7 +276,7 @@ func TestUpdateBrewfile_Unauthorized(t *testing.T) {
 		Content: "brew \"wget\"",
 	}
 
-	result, err := service.UpdateBrewfile(ctx, "my-brewfile", request)
+	result, _, err := service.UpdateBrewfile(ctx, "my-brewfile", request)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -296,7 +296,7 @@ func TestUpdateBrewfile_ValidationError(t *testing.T) {
 		Content: "tap \"foo/bar/baz\"", // Invalid according to API
 	}
 
-	result, err := service.UpdateBrewfile(ctx, "my-brewfile", request)
+	result, _, err := service.UpdateBrewfile(ctx, "my-brewfile", request)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -313,7 +313,7 @@ func TestDeleteBrewfile_Success(t *testing.T) {
 
 	ctx := context.Background()
 
-	result, err := service.DeleteBrewfile(ctx, "my-brewfile")
+	result, _, err := service.DeleteBrewfile(ctx, "my-brewfile")
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -327,7 +327,7 @@ func TestDeleteBrewfile_EmptyLabel(t *testing.T) {
 
 	ctx := context.Background()
 
-	result, err := service.DeleteBrewfile(ctx, "")
+	result, _, err := service.DeleteBrewfile(ctx, "")
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -344,7 +344,7 @@ func TestDeleteBrewfile_Unauthorized(t *testing.T) {
 
 	ctx := context.Background()
 
-	result, err := service.DeleteBrewfile(ctx, "my-brewfile")
+	result, _, err := service.DeleteBrewfile(ctx, "my-brewfile")
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -361,7 +361,7 @@ func TestListBrewfileRuns_Success(t *testing.T) {
 
 	ctx := context.Background()
 
-	result, err := service.ListBrewfileRuns(ctx, "my-brewfile")
+	result, _, err := service.ListBrewfileRuns(ctx, "my-brewfile")
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -392,7 +392,7 @@ func TestListBrewfileRuns_EmptyLabel(t *testing.T) {
 
 	ctx := context.Background()
 
-	result, err := service.ListBrewfileRuns(ctx, "")
+	result, _, err := service.ListBrewfileRuns(ctx, "")
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -409,7 +409,7 @@ func TestListBrewfileRuns_Unauthorized(t *testing.T) {
 
 	ctx := context.Background()
 
-	result, err := service.ListBrewfileRuns(ctx, "my-brewfile")
+	result, _, err := service.ListBrewfileRuns(ctx, "my-brewfile")
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -426,7 +426,7 @@ func TestListBrewfileRunsCSV_Success(t *testing.T) {
 
 	ctx := context.Background()
 
-	csvData, err := service.ListBrewfileRunsCSV(ctx, "my-brewfile")
+	csvData, _, err := service.ListBrewfileRunsCSV(ctx, "my-brewfile")
 
 	require.NoError(t, err)
 	require.NotNil(t, csvData)
@@ -446,7 +446,7 @@ func TestListBrewfileRunsCSV_EmptyLabel(t *testing.T) {
 
 	ctx := context.Background()
 
-	result, err := service.ListBrewfileRunsCSV(ctx, "")
+	result, _, err := service.ListBrewfileRunsCSV(ctx, "")
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -463,7 +463,7 @@ func TestListBrewfileRunsCSV_Unauthorized(t *testing.T) {
 
 	ctx := context.Background()
 
-	result, err := service.ListBrewfileRunsCSV(ctx, "my-brewfile")
+	result, _, err := service.ListBrewfileRunsCSV(ctx, "my-brewfile")
 
 	require.Error(t, err)
 	assert.Nil(t, result)

@@ -37,7 +37,7 @@ func main() {
 	brewfilesService := brewfiles.NewService(httpClient)
 
 	ctx := context.Background()
-	csvData, err := brewfilesService.ListBrewfileRunsCSV(ctx, brewfileLabel)
+	csvData, _, err := brewfilesService.ListBrewfileRunsCSV(ctx, brewfileLabel)
 	if err != nil {
 		log.Fatalf("Failed to list brewfile runs CSV: %v", err)
 	}

@@ -46,7 +46,7 @@ func TestListBrewCommands_Success(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListBrewCommands(ctx)
+	result, _, err := service.ListBrewCommands(ctx)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -77,7 +77,7 @@ func TestListBrewCommands_Unauthorized(t *testing.T) {
 	defer mockHandler.CleanupMockState()
 
 	ctx := context.Background()
-	result, err := service.ListBrewCommands(ctx)
+	result, _, err := service.ListBrewCommands(ctx)
 
 	require.Error(t, err)
 	assert.Nil(t, result)
@@ -97,7 +97,7 @@ func TestCreateBrewCommand_Success(t *testing.T) {
 		Arguments: "install wget",
 	}
 
-	result, err := service.CreateBrewCommand(ctx, request)
+	result, _, err := service.CreateBrewCommand(ctx, request)
 
 	require.NoError(t, err)
 	require.NotNil(t, result)
@@ -117,7 +117,7 @@ func TestCreateBrewCommand_FreeTier(t *testing.T) {
 		Arguments: "install wget",
 	}
 
-	result, err := service.CreateBrewCommand(ctx, request)
+	result, _, err := service.CreateBrewCommand(ctx, request)
 
 	require.Error(t, err)
 	assert.Nil(t, result)

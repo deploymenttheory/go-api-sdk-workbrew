@@ -36,7 +36,7 @@ func main() {
 	brewConfigsService := brewconfigurations.NewService(httpClient)
 
 	ctx := context.Background()
-	configs, err := brewConfigsService.ListBrewConfigurations(ctx)
+	configs, _, err := brewConfigsService.ListBrewConfigurations(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list brew configurations: %v", err)
 	}

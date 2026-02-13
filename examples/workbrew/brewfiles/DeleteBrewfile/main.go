@@ -37,7 +37,7 @@ func main() {
 	brewfilesService := brewfiles.NewService(httpClient)
 
 	ctx := context.Background()
-	response, err := brewfilesService.DeleteBrewfile(ctx, brewfileLabel)
+	response, _, err := brewfilesService.DeleteBrewfile(ctx, brewfileLabel)
 	if err != nil {
 		log.Fatalf("Failed to delete brewfile: %v", err)
 	}

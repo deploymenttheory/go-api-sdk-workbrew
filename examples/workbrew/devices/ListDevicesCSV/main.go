@@ -36,7 +36,7 @@ func main() {
 	devicesService := devices.NewService(httpClient)
 
 	ctx := context.Background()
-	csvData, err := devicesService.ListDevicesCSV(ctx)
+	csvData, _, err := devicesService.ListDevicesCSV(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list devices CSV: %v", err)
 	}

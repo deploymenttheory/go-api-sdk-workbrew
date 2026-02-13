@@ -36,7 +36,7 @@ func main() {
 	casksService := casks.NewService(httpClient)
 
 	ctx := context.Background()
-	csvData, err := casksService.ListCasksCSV(ctx)
+	csvData, _, err := casksService.ListCasksCSV(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list casks CSV: %v", err)
 	}

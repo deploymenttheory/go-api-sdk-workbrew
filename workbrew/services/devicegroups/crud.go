@@ -14,12 +14,12 @@ type (
 		// ListDeviceGroups returns a list of Device Groups
 		//
 		// Returns device groups with their IDs, names, and assigned device serial numbers.
-		ListDeviceGroups(ctx context.Context) (*DeviceGroupsResponse, error)
+		ListDeviceGroups(ctx context.Context) (*DeviceGroupsResponse, *interfaces.Response, error)
 
 		// ListDeviceGroupsCSV returns a list of Device Groups in CSV format
 		//
 		// Returns device group data as CSV with columns: id, name, devices.
-		ListDeviceGroupsCSV(ctx context.Context) ([]byte, error)
+		ListDeviceGroupsCSV(ctx context.Context) ([]byte, *interfaces.Response, error)
 	}
 
 	// Service handles communication with the device groups
@@ -41,15 +41,7 @@ func NewService(client interfaces.HTTPClient) *Service {
 
 // ListDeviceGroups retrieves all device groups in JSON format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/device_groups.json
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: application/json" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/device_groups.json"
-func (s *Service) ListDeviceGroups(ctx context.Context) (*DeviceGroupsResponse, error) {
+func (s *Service) ListDeviceGroups(ctx context.Context) (*DeviceGroupsResponse, *interfaces.Response, error) {
 	endpoint := EndpointDeviceGroupsJSON
 
 	headers := map[string]string{
@@ -60,25 +52,17 @@ func (s *Service) ListDeviceGroups(ctx context.Context) (*DeviceGroupsResponse, 
 	queryParams := make(map[string]string)
 
 	var result DeviceGroupsResponse
-	err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
+	resp, err := s.client.Get(ctx, endpoint, queryParams, headers, &result)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return &result, nil
+	return &result, resp, nil
 }
 
 // ListDeviceGroupsCSV retrieves all device groups in CSV format
 // URL: GET https://console.workbrew.com/workspaces/{workspace_name}/device_groups.csv
-//
-// Example cURL:
-//
-//	curl -X GET \
-//	  -H "Authorization: Bearer YOUR_API_KEY" \
-//	  -H "X-Workbrew-API-Version: v0" \
-//	  -H "Accept: text/csv" \
-//	  "https://console.workbrew.com/workspaces/{workspace}/device_groups.csv"
-func (s *Service) ListDeviceGroupsCSV(ctx context.Context) ([]byte, error) {
+func (s *Service) ListDeviceGroupsCSV(ctx context.Context) ([]byte, *interfaces.Response, error) {
 	endpoint := EndpointDeviceGroupsCSV
 
 	headers := map[string]string{
@@ -87,10 +71,10 @@ func (s *Service) ListDeviceGroupsCSV(ctx context.Context) ([]byte, error) {
 
 	queryParams := make(map[string]string)
 
-	csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
+	resp, csvData, err := s.client.GetCSV(ctx, endpoint, queryParams, headers)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return csvData, nil
+	return csvData, resp, nil
 }

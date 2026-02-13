@@ -36,7 +36,7 @@ func main() {
 	deviceGroupsService := devicegroups.NewService(httpClient)
 
 	ctx := context.Background()
-	csvData, err := deviceGroupsService.ListDeviceGroupsCSV(ctx)
+	csvData, _, err := deviceGroupsService.ListDeviceGroupsCSV(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list device groups CSV: %v", err)
 	}
