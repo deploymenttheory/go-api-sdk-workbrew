@@ -1,0 +1,182 @@
+# Codecov configuration for go-api-sdk-workbrew
+# For more info: https://docs.codecov.io/docs/codecov-yaml
+
+# Go Integration Test Coverage (Go 1.20+ Features)
+#
+#   1. https://go.dev/blog/integration-test-coverage
+#     - Official Go blog explaining Go 1.20+ coverage for integration tests
+#     - How to use go build -cover and go tool covdata
+#   2. https://dustinspecker.com/posts/go-combined-unit-integration-code-coverage/
+#     - Practical examples of merging unit and integration test coverage
+#     - Step-by-step commands for combining coverage data
+#   3. https://go.dev/doc/build-cover
+#     - Official documentation on coverage profiling
+#     - Using GOCOVERDIR environment variable
+#   4. https://netdevops.me/2023/test-coverage-for-go-integration-tests/
+#     - Real-world implementation examples
+#     - How to convert binary coverage format to text format for Codecov
+
+codecov:
+  bot: "codecov-io"
+  require_ci_to_pass: true
+  max_report_age: 24h
+  notify:
+    after_n_builds: 1
+    wait_for_ci: true
+
+coverage:
+  precision: 2
+  round: down
+  range: "60...90"
+
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 2%
+        base: auto
+        branches:
+          - main
+        if_ci_failed: error  # Informational only - GitHub Actions enforces
+        informational: true
+
+    patch:
+      default:
+        target: 60%  # Minimum coverage for new code - GitHub Actions enforces this
+        threshold: 5%
+        base: auto
+        branches:
+          - main
+        if_ci_failed: ignore  # Informational only - GitHub Actions enforces
+        informational: true
+
+# Flags for different test types
+flags:
+  unittests:
+    paths:
+      - "workbrew/"
+    carryforward: false
+
+  acceptancetests:
+    paths:
+      - "workbrew/"
+    carryforward: false
+
+  # Component-specific flags
+  client:
+    paths:
+      - "workbrew/client/"
+    carryforward: false
+
+  interfaces:
+    paths:
+      - "workbrew/interfaces/"
+    carryforward: false
+
+  # Service-specific flags for API endpoints
+  analytics:
+    paths:
+      - "workbrew/services/analytics/"
+    carryforward: false
+
+  brewcommands:
+    paths:
+      - "workbrew/services/brewcommands/"
+    carryforward: false
+
+  brewconfigurations:
+    paths:
+      - "workbrew/services/brewconfigurations/"
+    carryforward: false
+
+  brewfiles:
+    paths:
+      - "workbrew/services/brewfiles/"
+    carryforward: false
+
+  brewtaps:
+    paths:
+      - "workbrew/services/brewtaps/"
+    carryforward: false
+
+  casks:
+    paths:
+      - "workbrew/services/casks/"
+    carryforward: false
+
+  devicegroups:
+    paths:
+      - "workbrew/services/devicegroups/"
+    carryforward: false
+
+  devices:
+    paths:
+      - "workbrew/services/devices/"
+    carryforward: false
+
+  events:
+    paths:
+      - "workbrew/services/events/"
+    carryforward: false
+
+  formulae:
+    paths:
+      - "workbrew/services/formulae/"
+    carryforward: false
+
+  licenses:
+    paths:
+      - "workbrew/services/licenses/"
+    carryforward: false
+
+  vulnerabilities:
+    paths:
+      - "workbrew/services/vulnerabilities/"
+    carryforward: false
+
+  vulnerabilitychanges:
+    paths:
+      - "workbrew/services/vulnerabilitychanges/"
+    carryforward: false
+
+# Ignore paths that shouldn't count towards coverage
+ignore:
+  # Directories
+  - "tools/"
+  - "scripts/"
+  - "examples/"
+  - "docs/"
+
+  # Test files and fixtures
+  - "**/*_test.go"
+  - "**/testdata/**"
+  - "**/mocks/**"
+  - "**/tests/**"
+  - "**/acceptance/**"  # Acceptance test helpers and dependencies
+
+  # File types
+  - "*.md"              # Documentation files
+  - "*.json"            # Mock responses
+  - "*.yml"
+  - "*.yaml"
+  - "go.mod"
+  - "go.sum"
+
+# Parser settings for Go
+parsers:
+  go:
+    partials_as_hits: false
+
+# Pull request comment configuration
+comment:
+  layout: "diff, flags, files"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+  branches:
+    - main
+
+# GitHub Checks annotations
+github_checks:
+  annotations: true

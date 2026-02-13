@@ -49,6 +49,26 @@ func WithRetryCount(count int) ClientOption {
 	}
 }
 
+// WithRetryWaitTime sets the default wait time between retry attempts
+// This is the initial/minimum wait time before the first retry
+func WithRetryWaitTime(waitTime time.Duration) ClientOption {
+	return func(c *Client) error {
+		c.client.SetRetryWaitTime(waitTime)
+		c.logger.Info("Retry wait time configured", zap.Duration("wait_time", waitTime))
+		return nil
+	}
+}
+
+// WithRetryMaxWaitTime sets the maximum wait time between retry attempts
+// The wait time increases exponentially with each retry up to this maximum
+func WithRetryMaxWaitTime(maxWaitTime time.Duration) ClientOption {
+	return func(c *Client) error {
+		c.client.SetRetryMaxWaitTime(maxWaitTime)
+		c.logger.Info("Retry max wait time configured", zap.Duration("max_wait_time", maxWaitTime))
+		return nil
+	}
+}
+
 // WithLogger sets a custom logger for the client
 func WithLogger(logger *zap.Logger) ClientOption {
 	return func(c *Client) error {
