@@ -351,6 +351,7 @@ func TestCustomHeaders(t *testing.T) {
     }
     workbrewClient, err = client.NewClient(
         "test-key",
+        "test-workspace",
         client.WithGlobalHeaders(headers),
     )
     assert.NoError(t, err)
@@ -363,6 +364,7 @@ func TestCustomHeaders(t *testing.T) {
 // Use debug mode to see actual headers sent
 workbrewClient, err := client.NewClient(
     "test-key",
+    "test-workspace",
     client.WithGlobalHeader("X-Test", "value"),
     client.WithDebug(),
 )
@@ -399,6 +401,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
     workbrewClient, _ := client.NewClient(
         apiKey,
+        workspace,
         client.WithGlobalHeader("X-Request-ID", requestID),
     )
 
@@ -408,7 +411,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 ## Related Documentation
 
-- [Authentication](authentication.md) - Configure API key (also a header)
+- [Authentication](authentication.md) - Configure API key
 - [Debugging](debugging.md) - View headers in debug output
 - [Logging](logging.md) - Log header values (be careful with sensitive data)
 - [OpenTelemetry](opentelemetry.md) - Integrate trace context in headers

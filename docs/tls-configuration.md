@@ -349,6 +349,7 @@ func TestTLSConfiguration(t *testing.T) {
     // Test with custom CA
     workbrewClient, err := client.NewClient(
         "test-key",
+        "test-workspace",
         client.WithRootCertificates("/path/to/test-ca.pem"),
     )
     assert.NoError(t, err)
@@ -356,6 +357,7 @@ func TestTLSConfiguration(t *testing.T) {
     // Test minimum TLS version
     workbrewClient, err = client.NewClient(
         "test-key",
+        "test-workspace",
         client.WithMinTLSVersion(tls.VersionTLS12),
     )
     assert.NoError(t, err)

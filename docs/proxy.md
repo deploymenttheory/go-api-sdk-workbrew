@@ -136,7 +136,7 @@ export NO_PROXY="localhost,127.0.0.1"
 ```go
 // Client automatically uses HTTP_PROXY/HTTPS_PROXY environment variables
 // if no proxy is explicitly configured
-workbrewClient, err := client.NewClient(apiKey)
+workbrewClient, err := client.NewClient(apiKey, workspace)
 ```
 
 **When to use:** System-wide proxy configuration, containerized environments
@@ -315,6 +315,7 @@ func TestProxyConfiguration(t *testing.T) {
     // Test with proxy
     workbrewClient, err := client.NewClient(
         "test-key",
+        "test-workspace",
         client.WithProxy("http://proxy.test:8080"),
     )
     assert.NoError(t, err)

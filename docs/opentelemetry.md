@@ -201,7 +201,7 @@ exporter, _ := jaeger.New(jaeger.WithCollectorEndpoint(
 tp := trace.NewTracerProvider(trace.WithBatcher(exporter))
 otel.SetTracerProvider(tp)
 
-workbrewClient, _ := client.NewClient(apiKey, client.WithTracing(nil))
+workbrewClient, _ := client.NewClient(apiKey, workspace, client.WithTracing(nil))
 ```
 
 ### OTLP (OpenTelemetry Protocol)
@@ -216,7 +216,7 @@ exporter, _ := otlptracegrpc.New(context.Background(),
 
 tp := trace.NewTracerProvider(trace.WithBatcher(exporter))
 
-workbrewClient, _ := client.NewClient(apiKey, client.WithTracing(nil))
+workbrewClient, _ := client.NewClient(apiKey, workspace, client.WithTracing(nil))
 ```
 
 ## What Gets Traced
@@ -241,7 +241,7 @@ To disable tracing, simply omit the `WithTracing()` option:
 
 ```go
 // No tracing - client works normally without instrumentation
-workbrewClient, err := client.NewClient(apiKey)
+workbrewClient, err := client.NewClient(apiKey, workspace)
 ```
 
 ## Performance Considerations
@@ -256,11 +256,11 @@ workbrewClient, err := client.NewClient(apiKey)
 
 ## Complete Example
 
-See [examples/workbrew/observability/tracing/main.go](../../examples/workbrew/observability/tracing/main.go) for a complete working example.
+Check the [examples directory](../../examples/workbrew/) for complete working examples of the SDK in action.
 
 ## Related Documentation
 
 - [Structured Logging](logging.md) - Combine tracing with logging for complete observability
-- [Error Handling](error-handling.md) - How errors are captured in traces
-- [Context Support](context.md) - Using context for trace propagation
+- [Debugging](debugging.md) - Debug mode for detailed request inspection
+- [Authentication](authentication.md) - Configure API access
 - [OpenTelemetry Go Documentation](https://opentelemetry.io/docs/languages/go/)

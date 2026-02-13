@@ -272,7 +272,7 @@ func NewWorkbrewService() (*WorkbrewService, error) {
     }, nil
 }
 
-func (s *WorkbrewService) ScanFile(ctx context.Context, hash string, usePremium bool) {
+func (s *WorkbrewService) ListDevices(ctx context.Context, usePremium bool) {
     // Choose client based on requirements
     var c *client.Client
     if usePremium {
@@ -281,7 +281,7 @@ func (s *WorkbrewService) ScanFile(ctx context.Context, hash string, usePremium 
         c = s.publicClient
     }
 
-    filesService := files.NewService(c)
+    devicesService := devices.NewService(c)
     // ... use service
 }
 ```
@@ -349,7 +349,7 @@ if err != nil && client.IsQuotaExceeded(err) {
 }
 ```
 
-See [Rate Limiting Guide](rate-limiting.md) for more details.
+**Note:** Configure retry logic to handle rate limits - see [Timeouts & Retries](timeouts-retries.md) for more details.
 
 ## Testing with Authentication
 
@@ -381,7 +381,6 @@ go test -tags=acceptance ./...
 
 ## Related Documentation
 
-- [Error Handling](error-handling.md) - Handle authentication errors
-- [Rate Limiting](rate-limiting.md) - Understand API quotas
 - [Timeouts & Retries](timeouts-retries.md) - Configure retry logic for auth errors
-- [Workbrew API Keys](https://support.workbrew.com/hc/en-us/articles/115002088769-Please-give-me-an-API-key)
+- [Logging](logging.md) - Log authentication events
+- [Debugging](debugging.md) - Debug authentication issues

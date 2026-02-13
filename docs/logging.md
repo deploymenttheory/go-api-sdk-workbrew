@@ -282,7 +282,7 @@ func processDevices(logger *zap.Logger, devicesService *devices.Service) error {
     }
 
     logger.Info("Device processing complete",
-        zap.Int("device_count", len(result)),
+        zap.Int("device_count", len(*result)),
         zap.Duration("duration", resp.Duration),
     )
 
@@ -336,7 +336,7 @@ logger.Info("API call completed",
     zap.Duration("duration", duration),
     zap.Bool("success", err == nil),
     zap.String("endpoint", "/devices"),
-    zap.Int("result_count", len(result)),
+    zap.Int("result_count", len(*result)),
 )
 ```
 
@@ -366,7 +366,7 @@ logger = logger.With(
     zap.String("version", "1.0.0"),
 )
 
-workbrewClient, _ := client.NewClient(apiKey, client.WithLogger(logger))
+workbrewClient, _ := client.NewClient(apiKey, workspace, client.WithLogger(logger))
 ```
 
 ### Datadog
@@ -475,6 +475,6 @@ func TestLogging(t *testing.T) {
 ## Related Documentation
 
 - [OpenTelemetry Tracing](opentelemetry.md) - Combine logs with traces
-- [Error Handling](error-handling.md) - Log errors effectively
 - [Debugging](debugging.md) - Use debug mode for detailed inspection
+- [Authentication](authentication.md) - Configure API access
 - [Zap Documentation](https://pkg.go.dev/go.uber.org/zap)

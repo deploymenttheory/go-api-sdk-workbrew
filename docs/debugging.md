@@ -82,9 +82,9 @@ RESPONSE HEADERS:
 RESPONSE BODY:
 [
   {
-    "id": "device-123",
-    "name": "MacBook-Pro",
-    "status": "active",
+    "serial_number": "TC6R2DHVHG",
+    "mdm_user_or_device_name": "MacBook-Pro",
+    "device_type": "Mac",
     ...
   }
 ]
@@ -99,6 +99,7 @@ Enable standard debug output:
 ```go
 workbrewClient, err := client.NewClient(
     apiKey,
+    workspace,
     client.WithDebug(),
 )
 ```
@@ -125,6 +126,7 @@ logger, _ := zap.NewDevelopment()
 
 workbrewClient, err := client.NewClient(
     apiKey,
+    workspace,
     client.WithLogger(logger),
     client.WithDebug(),
 )
@@ -145,7 +147,7 @@ if os.Getenv("DEBUG") == "true" {
     options = append(options, client.WithDebug())
 }
 
-workbrewClient, err := client.NewClient(apiKey, options...)
+workbrewClient, err := client.NewClient(apiKey, workspace, options...)
 ```
 
 **When to use:** Toggle debug mode without code changes
@@ -167,6 +169,7 @@ Limit the size of bodies logged (useful for large responses):
 ```go
 workbrewClient, err := client.NewClient(
     apiKey,
+    workspace,
     client.WithDebug(),
     // Note: Body limit configuration would be in WithDebug options
     // This example shows the pattern
@@ -233,8 +236,8 @@ workbrewClient, _ := client.NewClient(
 )
 
 // Check if API key is being sent correctly
-_, _, err := filesService.GetFileReport(ctx, hash)
-// Look for "X-Apikey" header in debug output
+_, _, err := devicesService.ListDevices(ctx)
+// Look for "Authorization" header in debug output
 ```
 
 ### Scenario 2: Rate Limiting
@@ -247,8 +250,8 @@ workbrewClient, _ := client.NewClient(
 )
 
 // Debug output shows rate limit headers
-_, _, err := filesService.GetFileReport(ctx, hash)
-// Look for X-Ratelimit-* headers in response
+_, _, err := devicesService.ListDevices(ctx)
+// Look for rate limit headers in response
 ```
 
 ### Scenario 3: Request Format Verification
@@ -325,14 +328,14 @@ Debug mode logs sensitive information:
 
 ```go
 // Simply omit WithDebug() option
-workbrewClient, err := client.NewClient(apiKey)
+workbrewClient, err := client.NewClient(apiKey, workspace)
 
 // Or conditionally disable
 var options []client.ClientOption
 if os.Getenv("ENVIRONMENT") != "production" {
     options = append(options, client.WithDebug())
 }
-workbrewClient, err := client.NewClient(apiKey, options...)
+workbrewClient, err := client.NewClient(apiKey, workspace, options...)
 ```
 
 ## Alternative Debugging Tools
@@ -383,7 +386,7 @@ workbrewClient, _ := client.NewClient(
 
 // Log specific operations
 logger.Info("Making API call",
-    zap.String("endpoint", "/files/"+hash),
+    zap.String("endpoint", "/devices"),
     zap.String("method", "GET"),
 )
 ```
@@ -421,6 +424,7 @@ func TestDebugOutput(t *testing.T) {
 
     workbrewClient, _ := client.NewClient(
         "test-key",
+        "test-workspace",
         client.WithDebug(),
     )
 

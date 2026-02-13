@@ -162,7 +162,7 @@ func getDevicesWithTimeout(devicesService *devices.Service) error {
         return err
     }
 
-    log.Printf("Found %d devices", len(result))
+    log.Printf("Found %d devices", len(*result))
     return nil
 }
 ```
@@ -342,9 +342,7 @@ if err != nil {
    ```
 2. Increase retry count: `client.WithRetryCount(5)`
 3. Implement application-level rate limiting
-4. Consider upgrading to a higher-tier API key
-
-See [Rate Limiting Guide](rate-limiting.md) for more details.
+4. Contact Workbrew support about API limits
 
 ## Testing
 
@@ -355,12 +353,14 @@ func TestTimeout(t *testing.T) {
     // Create client with very short timeout
     workbrewClient, _ := client.NewClient(
         "test-api-key",
+        "test-workspace",
         client.WithTimeout(1*time.Millisecond),
     )
 
     // This will timeout
+    devicesService := devices.NewService(workbrewClient)
     ctx := context.Background()
-    _, _, err := filesService.GetFileReport(ctx, "hash")
+    _, _, err := devicesService.ListDevices(ctx)
 
     assert.Error(t, err)
 }
@@ -373,6 +373,7 @@ func TestRetries(t *testing.T) {
     // Create client with retries disabled for predictable testing
     workbrewClient, _ := client.NewClient(
         "test-api-key",
+        "test-workspace",
         client.WithRetryCount(0),
     )
 
@@ -383,7 +384,6 @@ func TestRetries(t *testing.T) {
 
 ## Related Documentation
 
-- [Error Handling](error-handling.md) - Handle timeout and retry errors
-- [Rate Limiting](rate-limiting.md) - Understand API quotas and 429 errors
-- [Context Support](context.md) - Use context for request control
 - [Authentication](authentication.md) - Configure API access
+- [Logging](logging.md) - Log timeout and retry events
+- [Debugging](debugging.md) - Debug timeout issues
