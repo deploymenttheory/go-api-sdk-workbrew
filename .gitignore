@@ -13,3 +13,8 @@
 # AI instructions
 .claude
 .cursor
+
+# Acceptance Tests
+workbrew/acceptance/.env
+workbrew/acceptance/*.log
+workbrew/acceptance/test_output/
