@@ -1,6 +1,7 @@
 package client
 
 import (
+	"sync"
 	"testing"
 
 	"go.uber.org/zap/zaptest"
@@ -72,15 +73,24 @@ func TestSetupAuthentication_Success(t *testing.T) {
 		APIVersion: "v1",
 	}
 
-	err := SetupAuthentication(client, authConfig, logger)
+	authManager, err := SetupAuthentication(client, authConfig, logger)
 
 	if err != nil {
 		t.Fatalf("SetupAuthentication() error = %v, want nil", err)
 	}
 
-	// Verify auth scheme is set
-	// Note: Resty v3 doesn't expose auth scheme directly, but we can verify the token
-	// by making a test request and checking the Authorization header
+	if authManager == nil {
+		t.Fatal("Expected non-nil AuthManager")
+	}
+
+	// Verify auth manager has correct key
+	apiKey, err := authManager.GetAPIKey()
+	if err != nil {
+		t.Errorf("GetAPIKey() error = %v, want nil", err)
+	}
+	if apiKey != "test-api-key-12345" {
+		t.Errorf("GetAPIKey() = %q, want %q", apiKey, "test-api-key-12345")
+	}
 
 	// Verify API version header is set
 	headers := client.Header()
@@ -98,16 +108,26 @@ func TestSetupAuthentication_DefaultAPIVersion(t *testing.T) {
 		APIVersion: "", // Empty, should use default
 	}
 
-	err := SetupAuthentication(client, authConfig, logger)
+	authManager, err := SetupAuthentication(client, authConfig, logger)
 
 	if err != nil {
 		t.Fatalf("SetupAuthentication() error = %v, want nil", err)
+	}
+
+	if authManager == nil {
+		t.Fatal("Expected non-nil AuthManager")
 	}
 
 	// Verify default API version is used
 	headers := client.Header()
 	if got := headers.Get(APIVersionHeader); got != DefaultAPIVersion {
 		t.Errorf("API version header = %q, want %q (default)", got, DefaultAPIVersion)
+	}
+
+	// Verify default API version via auth manager
+	version := authManager.GetAPIVersion()
+	if version != DefaultAPIVersion {
+		t.Errorf("GetAPIVersion() = %q, want %q", version, DefaultAPIVersion)
 	}
 }
 
@@ -143,18 +163,20 @@ func TestSetupAuthentication_InvalidConfig(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := SetupAuthentication(client, tt.authConfig, logger)
+			authManager, err := SetupAuthentication(client, tt.authConfig, logger)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SetupAuthentication() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
-			if tt.wantErr && err != nil {
-				if err.Error() == "" {
+			if tt.wantErr {
+				if authManager != nil {
+					t.Error("Expected nil AuthManager on error")
+				}
+				if err != nil && err.Error() == "" {
 					t.Error("Expected error message, got empty string")
 				}
-				// Just verify error exists, message format may vary
 			}
 		})
 	}
@@ -198,14 +220,24 @@ func TestSetupAuthentication_CustomAPIVersion(t *testing.T) {
 				APIVersion: tt.apiVersion,
 			}
 
-			err := SetupAuthentication(client, authConfig, logger)
+			authManager, err := SetupAuthentication(client, authConfig, logger)
 			if err != nil {
 				t.Fatalf("SetupAuthentication() error = %v, want nil", err)
+			}
+
+			if authManager == nil {
+				t.Fatal("Expected non-nil AuthManager")
 			}
 
 			headers := client.Header()
 			if got := headers.Get(APIVersionHeader); got != tt.expectedHeader {
 				t.Errorf("API version header = %q, want %q", got, tt.expectedHeader)
+			}
+
+			// Verify API version via auth manager
+			gotVersion := authManager.GetAPIVersion()
+			if gotVersion != tt.expectedHeader {
+				t.Errorf("GetAPIVersion() = %q, want %q", gotVersion, tt.expectedHeader)
 			}
 		})
 	}
@@ -220,14 +252,18 @@ func TestSetupAuthentication_HeadersAreSet(t *testing.T) {
 		APIVersion: "v1",
 	}
 
-	err := SetupAuthentication(client, authConfig, logger)
+	authManager, err := SetupAuthentication(client, authConfig, logger)
 	if err != nil {
 		t.Fatalf("SetupAuthentication() error = %v, want nil", err)
 	}
 
+	if authManager == nil {
+		t.Fatal("Expected non-nil AuthManager")
+	}
+
 	// Verify the API version header is present
-			headers := client.Header()
-			apiVersionHeader := headers.Get(APIVersionHeader)
+	headers := client.Header()
+	apiVersionHeader := headers.Get(APIVersionHeader)
 	if apiVersionHeader == "" {
 		t.Error("API version header should be set")
 	}
@@ -246,7 +282,7 @@ func TestSetupAuthentication_MultipleCallsOverwrite(t *testing.T) {
 		APIKey:     "first-key",
 		APIVersion: "v1",
 	}
-	err := SetupAuthentication(client, authConfig1, logger)
+	authManager1, err := SetupAuthentication(client, authConfig1, logger)
 	if err != nil {
 		t.Fatalf("First SetupAuthentication() error = %v, want nil", err)
 	}
@@ -257,12 +293,17 @@ func TestSetupAuthentication_MultipleCallsOverwrite(t *testing.T) {
 		t.Errorf("After first setup, API version = %q, want %q", got, "v1")
 	}
 
+	apiKey1, _ := authManager1.GetAPIKey()
+	if apiKey1 != "first-key" {
+		t.Errorf("First AuthManager key = %q, want %q", apiKey1, "first-key")
+	}
+
 	// Second setup with different values
 	authConfig2 := &AuthConfig{
 		APIKey:     "second-key",
 		APIVersion: "v2",
 	}
-	err = SetupAuthentication(client, authConfig2, logger)
+	authManager2, err := SetupAuthentication(client, authConfig2, logger)
 	if err != nil {
 		t.Fatalf("Second SetupAuthentication() error = %v, want nil", err)
 	}
@@ -271,6 +312,11 @@ func TestSetupAuthentication_MultipleCallsOverwrite(t *testing.T) {
 	headers = client.Header()
 	if got := headers.Get(APIVersionHeader); got != "v2" {
 		t.Errorf("After second setup, API version = %q, want %q", got, "v2")
+	}
+
+	apiKey2, _ := authManager2.GetAPIKey()
+	if apiKey2 != "second-key" {
+		t.Errorf("Second AuthManager key = %q, want %q", apiKey2, "second-key")
 	}
 }
 
@@ -309,7 +355,7 @@ func TestSetupAuthentication_NilClient(t *testing.T) {
 	}()
 
 	// This should panic or fail
-	_ = SetupAuthentication(nil, authConfig, logger)
+	_, _ = SetupAuthentication(nil, authConfig, logger)
 }
 
 func TestAuthConfig_LongAPIKey(t *testing.T) {
@@ -332,9 +378,12 @@ func TestAuthConfig_LongAPIKey(t *testing.T) {
 	// Setup should also work
 	logger := zaptest.NewLogger(t)
 	client := resty.New()
-	err = SetupAuthentication(client, config, logger)
+	authManager, err := SetupAuthentication(client, config, logger)
 	if err != nil {
 		t.Errorf("SetupAuthentication() with long API key error = %v, want nil", err)
+	}
+	if authManager == nil {
+		t.Error("Expected non-nil AuthManager")
 	}
 }
 
@@ -362,9 +411,12 @@ func TestAuthConfig_SpecialCharactersInAPIKey(t *testing.T) {
 
 			logger := zaptest.NewLogger(t)
 			client := resty.New()
-			err = SetupAuthentication(client, config, logger)
+			authManager, err := SetupAuthentication(client, config, logger)
 			if err != nil {
 				t.Errorf("SetupAuthentication() with key %q error = %v, want nil", key, err)
+			}
+			if authManager == nil {
+				t.Error("Expected non-nil AuthManager")
 			}
 		})
 	}
@@ -411,5 +463,370 @@ func TestAuthConfig_WhitespaceAPIKey(t *testing.T) {
 				t.Errorf("Validate() with whitespace key error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+	}
+}
+
+// Tests for AuthManager
+
+func TestAuthManager_GetAPIKey(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+
+	tests := []struct {
+		name    string
+		apiKey  string
+		wantErr bool
+	}{
+		{
+			name:    "valid API key",
+			apiKey:  "test-key-123",
+			wantErr: false,
+		},
+		{
+			name:    "empty API key",
+			apiKey:  "",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config := &AuthConfig{
+				APIKey:     tt.apiKey,
+				APIVersion: "v1",
+			}
+
+			am := NewAuthManager(config, logger)
+			key, err := am.GetAPIKey()
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetAPIKey() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if !tt.wantErr && key != tt.apiKey {
+				t.Errorf("GetAPIKey() = %q, want %q", key, tt.apiKey)
+			}
+		})
+	}
+}
+
+func TestAuthManager_UpdateAPIKey(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+
+	config := &AuthConfig{
+		APIKey:     "initial-key",
+		APIVersion: "v1",
+	}
+
+	am := NewAuthManager(config, logger)
+
+	// Verify initial key
+	initialKey, err := am.GetAPIKey()
+	if err != nil {
+		t.Fatalf("GetAPIKey() initial error = %v", err)
+	}
+	if initialKey != "initial-key" {
+		t.Errorf("Initial key = %q, want %q", initialKey, "initial-key")
+	}
+
+	// Update to new key
+	err = am.UpdateAPIKey("updated-key")
+	if err != nil {
+		t.Fatalf("UpdateAPIKey() error = %v", err)
+	}
+
+	// Verify updated key
+	updatedKey, err := am.GetAPIKey()
+	if err != nil {
+		t.Fatalf("GetAPIKey() after update error = %v", err)
+	}
+	if updatedKey != "updated-key" {
+		t.Errorf("Updated key = %q, want %q", updatedKey, "updated-key")
+	}
+}
+
+func TestAuthManager_UpdateAPIKey_EmptyKey(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+
+	config := &AuthConfig{
+		APIKey:     "initial-key",
+		APIVersion: "v1",
+	}
+
+	am := NewAuthManager(config, logger)
+
+	// Try to update with empty key
+	err := am.UpdateAPIKey("")
+	if err == nil {
+		t.Error("UpdateAPIKey() with empty key should return error")
+	}
+
+	// Verify original key is unchanged
+	key, _ := am.GetAPIKey()
+	if key != "initial-key" {
+		t.Errorf("Key after failed update = %q, want %q", key, "initial-key")
+	}
+}
+
+func TestAuthManager_ValidateAPIKey(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+
+	tests := []struct {
+		name    string
+		apiKey  string
+		wantErr bool
+	}{
+		{
+			name:    "valid key",
+			apiKey:  "valid-key",
+			wantErr: false,
+		},
+		{
+			name:    "empty key",
+			apiKey:  "",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config := &AuthConfig{
+				APIKey:     tt.apiKey,
+				APIVersion: "v1",
+			}
+
+			am := NewAuthManager(config, logger)
+			err := am.ValidateAPIKey()
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ValidateAPIKey() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestAuthManager_GetAPIVersion(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+
+	tests := []struct {
+		name       string
+		apiVersion string
+		want       string
+	}{
+		{
+			name:       "custom version",
+			apiVersion: "v1",
+			want:       "v1",
+		},
+		{
+			name:       "empty uses default",
+			apiVersion: "",
+			want:       DefaultAPIVersion,
+		},
+		{
+			name:       "custom version string",
+			apiVersion: "2024-01",
+			want:       "2024-01",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config := &AuthConfig{
+				APIKey:     "test-key",
+				APIVersion: tt.apiVersion,
+			}
+
+			am := NewAuthManager(config, logger)
+			got := am.GetAPIVersion()
+
+			if got != tt.want {
+				t.Errorf("GetAPIVersion() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+// Thread-safety tests
+
+func TestAuthManager_ConcurrentGetAPIKey(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+
+	config := &AuthConfig{
+		APIKey:     "concurrent-test-key",
+		APIVersion: "v1",
+	}
+
+	am := NewAuthManager(config, logger)
+
+	// Run 100 concurrent GetAPIKey calls
+	const numGoroutines = 100
+	var wg sync.WaitGroup
+	errors := make(chan error, numGoroutines)
+	keys := make(chan string, numGoroutines)
+
+	for i := 0; i < numGoroutines; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			key, err := am.GetAPIKey()
+			if err != nil {
+				errors <- err
+				return
+			}
+			keys <- key
+		}()
+	}
+
+	wg.Wait()
+	close(errors)
+	close(keys)
+
+	// Check for errors
+	for err := range errors {
+		t.Errorf("Concurrent GetAPIKey() error: %v", err)
+	}
+
+	// Verify all keys are correct
+	for key := range keys {
+		if key != "concurrent-test-key" {
+			t.Errorf("Concurrent GetAPIKey() = %q, want %q", key, "concurrent-test-key")
+		}
+	}
+}
+
+func TestAuthManager_ConcurrentUpdateAPIKey(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+
+	config := &AuthConfig{
+		APIKey:     "initial-key",
+		APIVersion: "v1",
+	}
+
+	am := NewAuthManager(config, logger)
+
+	// Run concurrent updates
+	const numGoroutines = 50
+	var wg sync.WaitGroup
+	errors := make(chan error, numGoroutines)
+
+	for i := 0; i < numGoroutines; i++ {
+		wg.Add(1)
+		keyNum := i
+		go func(n int) {
+			defer wg.Done()
+			newKey := "key-" + string(rune('0'+n%10))
+			err := am.UpdateAPIKey(newKey)
+			if err != nil {
+				errors <- err
+			}
+		}(keyNum)
+	}
+
+	wg.Wait()
+	close(errors)
+
+	// Check for errors
+	for err := range errors {
+		t.Errorf("Concurrent UpdateAPIKey() error: %v", err)
+	}
+
+	// Verify we can still get a key (any valid key is fine)
+	finalKey, err := am.GetAPIKey()
+	if err != nil {
+		t.Errorf("GetAPIKey() after concurrent updates error: %v", err)
+	}
+	if finalKey == "" {
+		t.Error("Final key should not be empty after concurrent updates")
+	}
+}
+
+func TestAuthManager_ConcurrentReadWrite(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+
+	config := &AuthConfig{
+		APIKey:     "initial-key",
+		APIVersion: "v1",
+	}
+
+	am := NewAuthManager(config, logger)
+
+	// Run concurrent reads and writes
+	const numReaders = 50
+	const numWriters = 10
+	var wg sync.WaitGroup
+
+	// Start readers
+	for i := 0; i < numReaders; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for j := 0; j < 100; j++ {
+				_, err := am.GetAPIKey()
+				if err != nil {
+					t.Errorf("Reader GetAPIKey() error: %v", err)
+				}
+			}
+		}()
+	}
+
+	// Start writers
+	for i := 0; i < numWriters; i++ {
+		wg.Add(1)
+		keyNum := i
+		go func(n int) {
+			defer wg.Done()
+			for j := 0; j < 10; j++ {
+				newKey := "key-" + string(rune('0'+n%10))
+				err := am.UpdateAPIKey(newKey)
+				if err != nil {
+					t.Errorf("Writer UpdateAPIKey() error: %v", err)
+				}
+			}
+		}(keyNum)
+	}
+
+	wg.Wait()
+
+	// Verify final state is valid
+	finalKey, err := am.GetAPIKey()
+	if err != nil {
+		t.Errorf("GetAPIKey() after concurrent read/write error: %v", err)
+	}
+	if finalKey == "" {
+		t.Error("Final key should not be empty")
+	}
+}
+
+func TestAuthManager_MiddlewareValidation(t *testing.T) {
+	logger := zaptest.NewLogger(t)
+	client := resty.New()
+
+	authConfig := &AuthConfig{
+		APIKey:     "middleware-test-key",
+		APIVersion: "v1",
+	}
+
+	authManager, err := SetupAuthentication(client, authConfig, logger)
+	if err != nil {
+		t.Fatalf("SetupAuthentication() error = %v", err)
+	}
+
+	// Update the API key
+	newKey := "updated-middleware-key"
+	err = authManager.UpdateAPIKey(newKey)
+	if err != nil {
+		t.Fatalf("UpdateAPIKey() error = %v", err)
+	}
+
+	// The middleware should use the updated key
+	// We can't easily test the actual request without a server,
+	// but we can verify the auth manager has the updated key
+	currentKey, err := authManager.GetAPIKey()
+	if err != nil {
+		t.Fatalf("GetAPIKey() error = %v", err)
+	}
+
+	if currentKey != newKey {
+		t.Errorf("Current key = %q, want %q", currentKey, newKey)
 	}
 }

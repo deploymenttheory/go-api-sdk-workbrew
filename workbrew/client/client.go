@@ -16,6 +16,7 @@ type Client struct {
 	client        *resty.Client
 	logger        *zap.Logger
 	authConfig    *AuthConfig
+	authManager   *AuthManager
 	BaseURL       string
 	globalHeaders map[string]string
 	userAgent     string
@@ -98,10 +99,12 @@ func NewClient(apiKey string, workspaceName string, options ...ClientOption) (*C
 		}
 	}
 
-	// Setup authentication
-	if err := SetupAuthentication(restyClient, authConfig, logger); err != nil {
+	// Setup authentication with middleware and thread-safe auth manager
+	authManager, err := SetupAuthentication(restyClient, authConfig, logger)
+	if err != nil {
 		return nil, fmt.Errorf("failed to setup authentication: %w", err)
 	}
+	client.authManager = authManager
 
 	// Set base URL with workspace
 	baseURLWithWorkspace := fmt.Sprintf("%s/workspaces/%s", client.BaseURL, workspaceName)
@@ -162,4 +165,46 @@ func (c *Client) SetWorkspace(workspaceName string) {
 //	    Build()
 func (c *Client) QueryBuilder() interfaces.ServiceQueryBuilder {
 	return NewQueryBuilder()
+}
+
+// GetAuthManager returns the auth manager instance for advanced authentication operations.
+// Use this to access the underlying auth manager for operations like API key rotation.
+//
+// Returns:
+//   - *AuthManager: The auth manager instance
+func (c *Client) GetAuthManager() *AuthManager {
+	return c.authManager
+}
+
+// UpdateAPIKey updates the API key at runtime without recreating the client.
+// This is useful for API key rotation or switching between multiple keys.
+//
+// Parameters:
+//   - newAPIKey: The new API key to use for authentication
+//
+// Returns:
+//   - error: Error if the auth manager is not initialized or the key is invalid
+//
+// Example:
+//
+//	err := client.UpdateAPIKey("new-api-key-12345")
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+func (c *Client) UpdateAPIKey(newAPIKey string) error {
+	if c.authManager == nil {
+		return fmt.Errorf("auth manager not initialized")
+	}
+	return c.authManager.UpdateAPIKey(newAPIKey)
+}
+
+// ValidateAPIKey validates that the current API key is set and valid.
+//
+// Returns:
+//   - error: Error if the auth manager is not initialized or the key is invalid
+func (c *Client) ValidateAPIKey() error {
+	if c.authManager == nil {
+		return fmt.Errorf("auth manager not initialized")
+	}
+	return c.authManager.ValidateAPIKey()
 }
