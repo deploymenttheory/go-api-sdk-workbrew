@@ -12,19 +12,19 @@ import (
 
 // TestConfig holds configuration for acceptance tests
 type TestConfig struct {
-	APIKey              string
-	WorkspaceName       string
-	BaseURL             string
-	RateLimitDelay      time.Duration
-	RequestTimeout      time.Duration
-	SkipCleanup         bool
-	Verbose             bool
-	KnownDeviceSerial   string
-	KnownGroupName      string
-	KnownBrewfileName   string
-	KnownCaskName       string
-	KnownFormulaName    string
-	KnownEventID        string
+	APIKey                string
+	WorkspaceName         string
+	BaseURL               string
+	RateLimitDelay        time.Duration
+	RequestTimeout        time.Duration
+	SkipCleanup           bool
+	Verbose               bool
+	KnownDeviceSerial     string
+	KnownGroupName        string
+	KnownBrewfileName     string
+	KnownCaskName         string
+	KnownFormulaName      string
+	KnownEventID          string
 	KnownVulnerabilityCVE string
 }
 
@@ -32,25 +32,25 @@ var (
 	// Config is the global test configuration
 	Config *TestConfig
 	// Client is the shared Workbrew client for acceptance tests
-	Client *client.Client
+	Client *client.Transport
 )
 
 // init initializes the test configuration from environment variables
 func init() {
 	Config = &TestConfig{
-		APIKey:              getEnv("WORKBREW_API_KEY", ""),
-		WorkspaceName:       getEnv("WORKBREW_WORKSPACE_NAME", ""),
-		BaseURL:             getEnv("WORKBREW_BASE_URL", "https://console.workbrew.com"),
-		RateLimitDelay:      getDurationEnv("WORKBREW_RATE_LIMIT_DELAY", 2*time.Second), // Conservative default
-		RequestTimeout:      getDurationEnv("WORKBREW_REQUEST_TIMEOUT", 30*time.Second),
-		SkipCleanup:         getBoolEnv("WORKBREW_SKIP_CLEANUP", false),
-		Verbose:             getBoolEnv("WORKBREW_VERBOSE", false),
-		KnownDeviceSerial:   getEnv("WORKBREW_TEST_DEVICE_SERIAL", ""),
-		KnownGroupName:      getEnv("WORKBREW_TEST_GROUP_NAME", ""),
-		KnownBrewfileName:   getEnv("WORKBREW_TEST_BREWFILE_NAME", ""),
-		KnownCaskName:       getEnv("WORKBREW_TEST_CASK_NAME", "docker"),          // Common cask
-		KnownFormulaName:    getEnv("WORKBREW_TEST_FORMULA_NAME", "git"),          // Common formula
-		KnownEventID:        getEnv("WORKBREW_TEST_EVENT_ID", ""),
+		APIKey:                getEnv("WORKBREW_API_KEY", ""),
+		WorkspaceName:         getEnv("WORKBREW_WORKSPACE_NAME", ""),
+		BaseURL:               getEnv("WORKBREW_BASE_URL", "https://console.workbrew.com"),
+		RateLimitDelay:        getDurationEnv("WORKBREW_RATE_LIMIT_DELAY", 2*time.Second), // Conservative default
+		RequestTimeout:        getDurationEnv("WORKBREW_REQUEST_TIMEOUT", 30*time.Second),
+		SkipCleanup:           getBoolEnv("WORKBREW_SKIP_CLEANUP", false),
+		Verbose:               getBoolEnv("WORKBREW_VERBOSE", false),
+		KnownDeviceSerial:     getEnv("WORKBREW_TEST_DEVICE_SERIAL", ""),
+		KnownGroupName:        getEnv("WORKBREW_TEST_GROUP_NAME", ""),
+		KnownBrewfileName:     getEnv("WORKBREW_TEST_BREWFILE_NAME", ""),
+		KnownCaskName:         getEnv("WORKBREW_TEST_CASK_NAME", "docker"), // Common cask
+		KnownFormulaName:      getEnv("WORKBREW_TEST_FORMULA_NAME", "git"), // Common formula
+		KnownEventID:          getEnv("WORKBREW_TEST_EVENT_ID", ""),
 		KnownVulnerabilityCVE: getEnv("WORKBREW_TEST_CVE", ""),
 	}
 }
@@ -66,7 +66,7 @@ func InitClient() error {
 	}
 
 	var err error
-	Client, err = client.NewClient(
+	Client, err = client.NewTransport(
 		Config.APIKey,
 		Config.WorkspaceName,
 		client.WithBaseURL(Config.BaseURL),

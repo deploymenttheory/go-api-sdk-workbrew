@@ -34,7 +34,6 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-
 	// Optional: Filter by actor type or add download parameter
 	opts := &events.RequestQueryOptions{
 		// Filter: "user",
