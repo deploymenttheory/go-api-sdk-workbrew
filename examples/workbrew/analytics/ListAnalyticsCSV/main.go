@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/client"
-	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/analytics"
+	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew"
 	"go.uber.org/zap"
 )
 
@@ -27,7 +27,7 @@ func main() {
 	defer logger.Sync()
 
 	// Create HTTP client
-	httpClient, err := client.NewClient(apiKey, workspace,
+	workbrewClient, err := workbrew.NewClient(apiKey, workspace,
 		client.WithLogger(logger),
 		client.WithBaseURL("https://console.workbrew.com"),
 	)
@@ -36,11 +36,10 @@ func main() {
 	}
 
 	// Create analytics service
-	analyticsService := analytics.NewService(httpClient)
 
 	// List analytics as CSV
 	ctx := context.Background()
-	csvData, _, err := analyticsService.ListAnalyticsCSV(ctx)
+	csvData, _, err := workbrewClient.Analytics.ListAnalyticsCSV(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list analytics CSV: %v", err)
 	}

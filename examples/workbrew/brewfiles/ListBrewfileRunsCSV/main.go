@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/client"
-	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/brewfiles"
 	"go.uber.org/zap"
 )
 
@@ -26,7 +26,7 @@ func main() {
 	}
 	defer logger.Sync()
 
-	httpClient, err := client.NewClient(apiKey, workspace,
+	workbrewClient, err := workbrew.NewClient(apiKey, workspace,
 		client.WithLogger(logger),
 		client.WithBaseURL("https://console.workbrew.com"),
 	)
@@ -34,10 +34,8 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	brewfilesService := brewfiles.NewService(httpClient)
-
 	ctx := context.Background()
-	csvData, _, err := brewfilesService.ListBrewfileRunsCSV(ctx, brewfileLabel)
+	csvData, _, err := workbrewClient.Brewfiles.ListBrewfileRunsCSV(ctx, brewfileLabel)
 	if err != nil {
 		log.Fatalf("Failed to list brewfile runs CSV: %v", err)
 	}

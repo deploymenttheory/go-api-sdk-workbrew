@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/client"
-	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/devicegroups"
+	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew"
 	"go.uber.org/zap"
 )
 
@@ -25,7 +25,7 @@ func main() {
 	}
 	defer logger.Sync()
 
-	httpClient, err := client.NewClient(apiKey, workspace,
+	workbrewClient, err := workbrew.NewClient(apiKey, workspace,
 		client.WithLogger(logger),
 		client.WithBaseURL("https://console.workbrew.com"),
 	)
@@ -33,10 +33,9 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	deviceGroupsService := devicegroups.NewService(httpClient)
 
 	ctx := context.Background()
-	groups, _, err := deviceGroupsService.ListDeviceGroups(ctx)
+	groups, _, err := workbrewClient.DeviceGroups.ListDeviceGroups(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list device groups: %v", err)
 	}

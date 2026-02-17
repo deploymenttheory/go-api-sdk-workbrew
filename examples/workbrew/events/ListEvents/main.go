@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/client"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/events"
 	"go.uber.org/zap"
@@ -25,7 +26,7 @@ func main() {
 	}
 	defer logger.Sync()
 
-	httpClient, err := client.NewClient(apiKey, workspace,
+	workbrewClient, err := workbrew.NewClient(apiKey, workspace,
 		client.WithLogger(logger),
 		client.WithBaseURL("https://console.workbrew.com"),
 	)
@@ -33,7 +34,6 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	eventsService := events.NewService(httpClient)
 
 	// Optional: Filter by actor type (user, system, or all)
 	opts := &events.RequestQueryOptions{
@@ -41,7 +41,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	eventsList, _, err := eventsService.ListEvents(ctx, opts)
+	eventsList, _, err := workbrewClient.Events.ListEvents(ctx, opts)
 	if err != nil {
 		log.Fatalf("Failed to list events: %v", err)
 	}

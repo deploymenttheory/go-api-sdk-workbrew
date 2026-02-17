@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/client"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/brewcommands"
 	"go.uber.org/zap"
@@ -25,7 +26,7 @@ func main() {
 	}
 	defer logger.Sync()
 
-	httpClient, err := client.NewClient(apiKey, workspace,
+	workbrewClient, err := workbrew.NewClient(apiKey, workspace,
 		client.WithLogger(logger),
 		client.WithBaseURL("https://console.workbrew.com"),
 	)
@@ -33,7 +34,6 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	brewCommandsService := brewcommands.NewService(httpClient)
 
 	// Create brew command request
 	recurrence := "once"
@@ -46,7 +46,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	response, _, err := brewCommandsService.CreateBrewCommand(ctx, request)
+	response, _, err := workbrewClient.BrewCommands.CreateBrewCommand(ctx, request)
 	if err != nil {
 		log.Fatalf("Failed to create brew command: %v", err)
 	}

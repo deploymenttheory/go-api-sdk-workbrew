@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/client"
-	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/analytics"
 	"go.uber.org/zap"
 )
 
@@ -26,8 +26,8 @@ func main() {
 	}
 	defer logger.Sync()
 
-	// Create HTTP client
-	httpClient, err := client.NewClient(apiKey, workspace,
+	// Create Workbrew client with all services ready
+	workbrewClient, err := workbrew.NewClient(apiKey, workspace,
 		client.WithLogger(logger),
 		client.WithBaseURL("https://console.workbrew.com"),
 	)
@@ -35,12 +35,9 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	// Create analytics service
-	analyticsService := analytics.NewService(httpClient)
-
-	// List analytics
+	// List analytics using the built-in Analytics service
 	ctx := context.Background()
-	analyticsData, _, err := analyticsService.ListAnalytics(ctx)
+	analyticsData, _, err := workbrewClient.Analytics.ListAnalytics(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list analytics: %v", err)
 	}

@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/client"
-	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/vulnerabilities"
+	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew"
 	"go.uber.org/zap"
 )
 
@@ -25,7 +25,7 @@ func main() {
 	}
 	defer logger.Sync()
 
-	httpClient, err := client.NewClient(apiKey, workspace,
+	workbrewClient, err := workbrew.NewClient(apiKey, workspace,
 		client.WithLogger(logger),
 		client.WithBaseURL("https://console.workbrew.com"),
 	)
@@ -33,10 +33,9 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	vulnerabilitiesService := vulnerabilities.NewService(httpClient)
 
 	ctx := context.Background()
-	csvData, _, err := vulnerabilitiesService.ListVulnerabilitiesCSV(ctx)
+	csvData, _, err := workbrewClient.Vulnerabilities.ListVulnerabilitiesCSV(ctx)
 	if err != nil {
 		log.Fatalf("Failed to list vulnerabilities CSV: %v", err)
 	}

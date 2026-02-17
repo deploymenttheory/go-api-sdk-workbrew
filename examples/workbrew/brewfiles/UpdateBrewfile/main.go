@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/client"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/brewfiles"
 	"go.uber.org/zap"
@@ -26,7 +27,7 @@ func main() {
 	}
 	defer logger.Sync()
 
-	httpClient, err := client.NewClient(apiKey, workspace,
+	workbrewClient, err := workbrew.NewClient(apiKey, workspace,
 		client.WithLogger(logger),
 		client.WithBaseURL("https://console.workbrew.com"),
 	)
@@ -34,15 +35,13 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	brewfilesService := brewfiles.NewService(httpClient)
-
 	// Update brewfile request
 	request := &brewfiles.UpdateBrewfileRequest{
 		Content: "brew \"wget\"\nbrew \"htop\"\nbrew \"curl\"",
 	}
 
 	ctx := context.Background()
-	response, _, err := brewfilesService.UpdateBrewfile(ctx, brewfileLabel, request)
+	response, _, err := workbrewClient.Brewfiles.UpdateBrewfile(ctx, brewfileLabel, request)
 	if err != nil {
 		log.Fatalf("Failed to update brewfile: %v", err)
 	}

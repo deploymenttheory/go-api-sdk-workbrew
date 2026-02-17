@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/client"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/brewfiles"
 	"go.uber.org/zap"
@@ -25,15 +26,13 @@ func main() {
 	}
 	defer logger.Sync()
 
-	httpClient, err := client.NewClient(apiKey, workspace,
+	workbrewClient, err := workbrew.NewClient(apiKey, workspace,
 		client.WithLogger(logger),
 		client.WithBaseURL("https://console.workbrew.com"),
 	)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
-
-	brewfilesService := brewfiles.NewService(httpClient)
 
 	// Create brewfile request
 	// Option 1: Assign to specific devices (comma-separated serial numbers)
@@ -47,7 +46,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	response, _, err := brewfilesService.CreateBrewfile(ctx, request)
+	response, _, err := workbrewClient.Brewfiles.CreateBrewfile(ctx, request)
 	if err != nil {
 		log.Fatalf("Failed to create brewfile: %v", err)
 	}
