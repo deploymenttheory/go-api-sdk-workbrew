@@ -30,7 +30,7 @@ func TestWithRetryWaitTime(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			logger := zaptest.NewLogger(t)
 
-			client, err := NewClient(
+			client, err := NewTransport(
 				"test-api-key",
 				"test-workspace",
 				WithLogger(logger),
@@ -38,11 +38,11 @@ func TestWithRetryWaitTime(t *testing.T) {
 			)
 
 			if err != nil {
-				t.Fatalf("NewClient() error = %v, want nil", err)
+				t.Fatalf("NewTransport() error = %v, want nil", err)
 			}
 
 			if client == nil {
-				t.Fatal("NewClient() returned nil client")
+				t.Fatal("NewTransport() returned nil client")
 			}
 
 			// Verify the client was created successfully with the option applied
@@ -76,7 +76,7 @@ func TestWithRetryMaxWaitTime(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			logger := zaptest.NewLogger(t)
 
-			client, err := NewClient(
+			client, err := NewTransport(
 				"test-api-key",
 				"test-workspace",
 				WithLogger(logger),
@@ -84,11 +84,11 @@ func TestWithRetryMaxWaitTime(t *testing.T) {
 			)
 
 			if err != nil {
-				t.Fatalf("NewClient() error = %v, want nil", err)
+				t.Fatalf("NewTransport() error = %v, want nil", err)
 			}
 
 			if client == nil {
-				t.Fatal("NewClient() returned nil client")
+				t.Fatal("NewTransport() returned nil client")
 			}
 
 			// Verify the client was created successfully with the option applied
@@ -103,7 +103,7 @@ func TestWithRetryConfiguration_Combined(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 
 	// Test combining all retry options
-	client, err := NewClient(
+	client, err := NewTransport(
 		"test-api-key",
 		"test-workspace",
 		WithLogger(logger),
@@ -113,11 +113,11 @@ func TestWithRetryConfiguration_Combined(t *testing.T) {
 	)
 
 	if err != nil {
-		t.Fatalf("NewClient() with combined retry options error = %v, want nil", err)
+		t.Fatalf("NewTransport() with combined retry options error = %v, want nil", err)
 	}
 
 	if client == nil {
-		t.Fatal("NewClient() returned nil client")
+		t.Fatal("NewTransport() returned nil client")
 	}
 
 	// Verify the client was created successfully
@@ -130,7 +130,7 @@ func TestWithRetryWaitTime_ZeroDuration(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 
 	// Test with zero duration (edge case)
-	client, err := NewClient(
+	client, err := NewTransport(
 		"test-api-key",
 		"test-workspace",
 		WithLogger(logger),
@@ -138,11 +138,11 @@ func TestWithRetryWaitTime_ZeroDuration(t *testing.T) {
 	)
 
 	if err != nil {
-		t.Fatalf("NewClient() with zero wait time error = %v, want nil", err)
+		t.Fatalf("NewTransport() with zero wait time error = %v, want nil", err)
 	}
 
 	if client == nil {
-		t.Fatal("NewClient() returned nil client")
+		t.Fatal("NewTransport() returned nil client")
 	}
 }
 
@@ -150,7 +150,7 @@ func TestWithRetryMaxWaitTime_ZeroDuration(t *testing.T) {
 	logger := zaptest.NewLogger(t)
 
 	// Test with zero duration (edge case)
-	client, err := NewClient(
+	client, err := NewTransport(
 		"test-api-key",
 		"test-workspace",
 		WithLogger(logger),
@@ -158,10 +158,10 @@ func TestWithRetryMaxWaitTime_ZeroDuration(t *testing.T) {
 	)
 
 	if err != nil {
-		t.Fatalf("NewClient() with zero max wait time error = %v, want nil", err)
+		t.Fatalf("NewTransport() with zero max wait time error = %v, want nil", err)
 	}
 
 	if client == nil {
-		t.Fatal("NewClient() returned nil client")
+		t.Fatal("NewTransport() returned nil client")
 	}
 }

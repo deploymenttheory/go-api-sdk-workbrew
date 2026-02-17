@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"go.uber.org/zap"
+
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/client"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/analytics"
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/brewcommands"
@@ -20,12 +22,14 @@ import (
 	"github.com/deploymenttheory/go-api-sdk-workbrew/workbrew/services/vulnerabilitychanges"
 )
 
-// Client is the main entry point for the Workbrew API SDK
-// It aggregates all service clients and provides a unified interface
+// Client is the main entry point for the Workbrew API SDK.
+// It aggregates all service clients and provides a unified interface.
+// Users should interact with the API exclusively through the provided service methods.
 type Client struct {
-	*client.Client
+	// transport is the internal HTTP transport layer (not exposed to users)
+	transport *client.Transport
 
-	// Services
+	// Services - users should only call methods on these services
 	Analytics            *analytics.Service
 	BrewCommands         *brewcommands.Service
 	BrewConfigurations   *brewconfigurations.Service
@@ -56,28 +60,28 @@ type Client struct {
 //	    workbrew.WithDebug(),
 //	)
 func NewClient(apiKey string, workspaceName string, options ...client.ClientOption) (*Client, error) {
-	// Create base HTTP client
-	httpClient, err := client.NewClient(apiKey, workspaceName, options...)
+	// Create base HTTP transport
+	transport, err := client.NewTransport(apiKey, workspaceName, options...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create HTTP client: %w", err)
+		return nil, fmt.Errorf("failed to create HTTP transport: %w", err)
 	}
 
 	// Initialize service clients
 	c := &Client{
-		Client:               httpClient,
-		Analytics:            analytics.NewService(httpClient),
-		BrewCommands:         brewcommands.NewService(httpClient),
-		BrewConfigurations:   brewconfigurations.NewService(httpClient),
-		Brewfiles:            brewfiles.NewService(httpClient),
-		BrewTaps:             brewtaps.NewService(httpClient),
-		Casks:                casks.NewService(httpClient),
-		DeviceGroups:         devicegroups.NewService(httpClient),
-		Devices:              devices.NewService(httpClient),
-		Events:               events.NewService(httpClient),
-		Formulae:             formulae.NewService(httpClient),
-		Licenses:             licenses.NewService(httpClient),
-		Vulnerabilities:      vulnerabilities.NewService(httpClient),
-		VulnerabilityChanges: vulnerabilitychanges.NewService(httpClient),
+		transport:            transport,
+		Analytics:            analytics.NewService(transport),
+		BrewCommands:         brewcommands.NewService(transport),
+		BrewConfigurations:   brewconfigurations.NewService(transport),
+		Brewfiles:            brewfiles.NewService(transport),
+		BrewTaps:             brewtaps.NewService(transport),
+		Casks:                casks.NewService(transport),
+		DeviceGroups:         devicegroups.NewService(transport),
+		Devices:              devices.NewService(transport),
+		Events:               events.NewService(transport),
+		Formulae:             formulae.NewService(transport),
+		Licenses:             licenses.NewService(transport),
+		Vulnerabilities:      vulnerabilities.NewService(transport),
+		VulnerabilityChanges: vulnerabilitychanges.NewService(transport),
 	}
 
 	return c, nil
@@ -117,4 +121,26 @@ func NewClientFromEnv(options ...client.ClientOption) (*Client, error) {
 	}
 
 	return NewClient(apiKey, workspaceName, options...)
+}
+
+// SetWorkspace changes the active workspace for all subsequent API calls.
+// This updates the base URL to target the specified workspace.
+//
+// Parameters:
+//   - workspaceName: The name of the workspace to switch to
+//
+// Example:
+//
+//	client.SetWorkspace("production-workspace")
+func (c *Client) SetWorkspace(workspaceName string) {
+	c.transport.SetWorkspace(workspaceName)
+}
+
+// GetLogger returns the configured zap logger instance.
+// Use this to add custom logging within your application using the same logger.
+//
+// Returns:
+//   - *zap.Logger: The configured logger instance
+func (c *Client) GetLogger() *zap.Logger {
+	return c.transport.GetLogger()
 }

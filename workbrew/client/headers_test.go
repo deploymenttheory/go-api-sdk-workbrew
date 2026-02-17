@@ -8,7 +8,7 @@ import (
 
 func TestApplyHeaders_GlobalOnly(t *testing.T) {
 	// Create a test client with global headers
-	client := &Client{
+	transport := &Transport{
 		client: resty.New(),
 		globalHeaders: map[string]string{
 			"X-Global-Header-1": "global-value-1",
@@ -17,10 +17,10 @@ func TestApplyHeaders_GlobalOnly(t *testing.T) {
 	}
 
 	// Create a request
-	req := client.client.R()
+	req := transport.client.R()
 
 	// Apply headers with no per-request headers
-	client.applyHeaders(req, nil)
+	transport.applyHeaders(req, nil)
 
 	// Verify global headers are set
 	header := req.Header
@@ -34,20 +34,20 @@ func TestApplyHeaders_GlobalOnly(t *testing.T) {
 
 func TestApplyHeaders_RequestOnly(t *testing.T) {
 	// Create a test client with no global headers
-	client := &Client{
+	transport := &Transport{
 		client:        resty.New(),
 		globalHeaders: make(map[string]string),
 	}
 
 	// Create a request
-	req := client.client.R()
+	req := transport.client.R()
 
 	// Apply headers with per-request headers
 	requestHeaders := map[string]string{
 		"X-Request-Header-1": "request-value-1",
 		"X-Request-Header-2": "request-value-2",
 	}
-	client.applyHeaders(req, requestHeaders)
+	transport.applyHeaders(req, requestHeaders)
 
 	// Verify request headers are set
 	header := req.Header
@@ -61,7 +61,7 @@ func TestApplyHeaders_RequestOnly(t *testing.T) {
 
 func TestApplyHeaders_Override(t *testing.T) {
 	// Create a test client with global headers
-	client := &Client{
+	transport := &Transport{
 		client: resty.New(),
 		globalHeaders: map[string]string{
 			"X-Shared-Header":  "global-value",
@@ -72,7 +72,7 @@ func TestApplyHeaders_Override(t *testing.T) {
 	}
 
 	// Create a request
-	req := client.client.R()
+	req := transport.client.R()
 
 	// Apply headers with per-request headers that override some global headers
 	requestHeaders := map[string]string{
@@ -80,7 +80,7 @@ func TestApplyHeaders_Override(t *testing.T) {
 		"X-Request-Only":  "request-only-value",
 		"Content-Type":    "application/xml",
 	}
-	client.applyHeaders(req, requestHeaders)
+	transport.applyHeaders(req, requestHeaders)
 
 	// Verify request headers override global headers
 	header := req.Header
@@ -107,7 +107,7 @@ func TestApplyHeaders_Override(t *testing.T) {
 
 func TestApplyHeaders_EmptyValues(t *testing.T) {
 	// Create a test client with global headers including empty values
-	client := &Client{
+	transport := &Transport{
 		client: resty.New(),
 		globalHeaders: map[string]string{
 			"X-Valid-Header": "valid-value",
@@ -116,14 +116,14 @@ func TestApplyHeaders_EmptyValues(t *testing.T) {
 	}
 
 	// Create a request
-	req := client.client.R()
+	req := transport.client.R()
 
 	// Apply headers with per-request headers including empty values
 	requestHeaders := map[string]string{
 		"X-Request-Header": "request-value",
 		"X-Empty-Request":  "",
 	}
-	client.applyHeaders(req, requestHeaders)
+	transport.applyHeaders(req, requestHeaders)
 
 	// Verify valid headers are set
 	header := req.Header
@@ -145,16 +145,16 @@ func TestApplyHeaders_EmptyValues(t *testing.T) {
 
 func TestApplyHeaders_NilMaps(t *testing.T) {
 	// Create a test client with nil global headers
-	client := &Client{
+	transport := &Transport{
 		client:        resty.New(),
 		globalHeaders: nil,
 	}
 
 	// Create a request
-	req := client.client.R()
+	req := transport.client.R()
 
 	// Apply headers with nil request headers - should not panic
-	client.applyHeaders(req, nil)
+	transport.applyHeaders(req, nil)
 
 	// No headers should be set
 	if len(req.Header) > 0 {
@@ -164,17 +164,17 @@ func TestApplyHeaders_NilMaps(t *testing.T) {
 
 func TestApplyHeaders_EmptyMaps(t *testing.T) {
 	// Create a test client with empty global headers
-	client := &Client{
+	transport := &Transport{
 		client:        resty.New(),
 		globalHeaders: make(map[string]string),
 	}
 
 	// Create a request
-	req := client.client.R()
+	req := transport.client.R()
 
 	// Apply headers with empty request headers
 	requestHeaders := make(map[string]string)
-	client.applyHeaders(req, requestHeaders)
+	transport.applyHeaders(req, requestHeaders)
 
 	// No headers should be set
 	if len(req.Header) > 0 {
@@ -240,13 +240,13 @@ func TestApplyHeaders_Precedence(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &Client{
+			transport := &Transport{
 				client:        resty.New(),
 				globalHeaders: tt.globalHeaders,
 			}
 
-			req := client.client.R()
-			client.applyHeaders(req, tt.requestHeaders)
+			req := transport.client.R()
+			transport.applyHeaders(req, tt.requestHeaders)
 
 			got := req.Header.Get(tt.checkHeader)
 			if got != tt.expectedValue {
@@ -258,15 +258,15 @@ func TestApplyHeaders_Precedence(t *testing.T) {
 
 func TestApplyHeaders_CaseInsensitivity(t *testing.T) {
 	// HTTP headers are case-insensitive, verify this works correctly
-	client := &Client{
+	transport := &Transport{
 		client: resty.New(),
 		globalHeaders: map[string]string{
 			"Content-Type": "application/json",
 		},
 	}
 
-	req := client.client.R()
-	client.applyHeaders(req, nil)
+	req := transport.client.R()
+	transport.applyHeaders(req, nil)
 
 	// HTTP headers are canonicalized by net/http, so we can check different cases
 	if got := req.Header.Get("content-type"); got != "application/json" {
@@ -282,7 +282,7 @@ func TestApplyHeaders_CaseInsensitivity(t *testing.T) {
 
 func TestApplyHeaders_CommonHeaders(t *testing.T) {
 	// Test common HTTP headers that might be used
-	client := &Client{
+	transport := &Transport{
 		client: resty.New(),
 		globalHeaders: map[string]string{
 			"User-Agent":    "WorkbrewSDK/1.0",
@@ -291,7 +291,7 @@ func TestApplyHeaders_CommonHeaders(t *testing.T) {
 		},
 	}
 
-	req := client.client.R()
+	req := transport.client.R()
 
 	requestHeaders := map[string]string{
 		"X-Request-ID":  "12345",
@@ -299,7 +299,7 @@ func TestApplyHeaders_CommonHeaders(t *testing.T) {
 		"Content-Type":  "application/json",
 	}
 
-	client.applyHeaders(req, requestHeaders)
+	transport.applyHeaders(req, requestHeaders)
 
 	// Check all headers are properly set
 	expectedHeaders := map[string]string{

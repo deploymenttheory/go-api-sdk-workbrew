@@ -9,10 +9,11 @@ import (
 	"resty.dev/v3"
 )
 
-// Client represents the HTTP client for Workbrew API.
+// Transport represents the HTTP transport layer for Workbrew API.
 // It provides methods for making HTTP requests to the Workbrew API with built-in
 // authentication, retry logic, and request/response logging.
-type Client struct {
+// This is an internal component - users should use workbrew.NewClient() instead.
+type Transport struct {
 	client        *resty.Client
 	logger        *zap.Logger
 	authConfig    *AuthConfig
@@ -21,41 +22,25 @@ type Client struct {
 	userAgent     string
 }
 
-// NewClient creates a new Workbrew API client with the provided API key and workspace.
+// NewTransport creates a new Workbrew API transport with the provided API key and workspace.
+// This is an internal function - users should use workbrew.NewClient() instead.
 //
 // Parameters:
 //   - apiKey: Your Workbrew API key (required)
 //   - workspaceName: The name of the workspace to use (required)
-//   - options: Optional client configuration options
+//   - options: Optional transport configuration options
 //
 // Returns:
-//   - *Client: Configured API client instance
-//   - error: Any error encountered during client creation
+//   - *Transport: Configured API transport instance
+//   - error: Any error encountered during transport creation
 //
-// The client is configured with:
+// The transport is configured with:
 //   - Default timeout of 120 seconds
 //   - Automatic retry on transient failures (up to 3 retries)
 //   - Gzip compression support
 //   - Bearer token authentication
 //   - Production-ready logger (use WithLogger to customize)
-//
-// Example:
-//
-//	client, err := client.NewClient("your-api-key", "your-workspace")
-//	if err != nil {
-//	    log.Fatal(err)
-//	}
-//
-// Example with options:
-//
-//	client, err := client.NewClient(
-//	    "your-api-key",
-//	    "your-workspace",
-//	    client.WithTimeout(60 * time.Second),
-//	    client.WithRetryCount(5),
-//	    client.WithDebug(),
-//	)
-func NewClient(apiKey string, workspaceName string, options ...ClientOption) (*Client, error) {
+func NewTransport(apiKey string, workspaceName string, options ...ClientOption) (*Transport, error) {
 	// Create default logger
 	logger, err := zap.NewProduction()
 	if err != nil {
@@ -80,7 +65,7 @@ func NewClient(apiKey string, workspaceName string, options ...ClientOption) (*C
 	restyClient.SetHeader("User-Agent", userAgent)
 	restyClient.SetHeader("Accept-Encoding", "gzip")
 
-	client := &Client{
+	transport := &Transport{
 		client:        restyClient,
 		logger:        logger,
 		authConfig:    authConfig,
@@ -91,7 +76,7 @@ func NewClient(apiKey string, workspaceName string, options ...ClientOption) (*C
 
 	// Apply any additional options
 	for _, option := range options {
-		if err := option(client); err != nil {
+		if err := option(transport); err != nil {
 			return nil, fmt.Errorf("failed to apply client option: %w", err)
 		}
 	}
@@ -100,14 +85,14 @@ func NewClient(apiKey string, workspaceName string, options ...ClientOption) (*C
 		return nil, fmt.Errorf("failed to setup authentication: %w", err)
 	}
 
-	baseURLWithWorkspace := fmt.Sprintf("%s/workspaces/%s", client.BaseURL, workspaceName)
+	baseURLWithWorkspace := fmt.Sprintf("%s/workspaces/%s", transport.BaseURL, workspaceName)
 	restyClient.SetBaseURL(baseURLWithWorkspace)
 
-	logger.Info("Workbrew API client created",
+	logger.Info("Workbrew API transport created",
 		zap.String("base_url", baseURLWithWorkspace),
 		zap.String("api_version", authConfig.APIVersion))
 
-	return client, nil
+	return transport, nil
 }
 
 // GetHTTPClient returns the underlying resty HTTP client.
@@ -115,8 +100,8 @@ func NewClient(apiKey string, workspaceName string, options ...ClientOption) (*C
 //
 // Returns:
 //   - *resty.Client: The underlying resty client instance
-func (c *Client) GetHTTPClient() *resty.Client {
-	return c.client
+func (t *Transport) GetHTTPClient() *resty.Client {
+	return t.client
 }
 
 // GetLogger returns the configured zap logger instance.
@@ -124,8 +109,8 @@ func (c *Client) GetHTTPClient() *resty.Client {
 //
 // Returns:
 //   - *zap.Logger: The configured logger instance
-func (c *Client) GetLogger() *zap.Logger {
-	return c.logger
+func (t *Transport) GetLogger() *zap.Logger {
+	return t.logger
 }
 
 // SetWorkspace changes the active workspace for all subsequent API calls.
@@ -136,11 +121,11 @@ func (c *Client) GetLogger() *zap.Logger {
 //
 // Example:
 //
-//	client.SetWorkspace("production-workspace")
-func (c *Client) SetWorkspace(workspaceName string) {
-	baseURLWithWorkspace := fmt.Sprintf("%s/workspaces/%s", c.BaseURL, workspaceName)
-	c.client.SetBaseURL(baseURLWithWorkspace)
-	c.logger.Info("Workspace changed", zap.String("workspace", workspaceName))
+//	transport.SetWorkspace("production-workspace")
+func (t *Transport) SetWorkspace(workspaceName string) {
+	baseURLWithWorkspace := fmt.Sprintf("%s/workspaces/%s", t.BaseURL, workspaceName)
+	t.client.SetBaseURL(baseURLWithWorkspace)
+	t.logger.Info("Workspace changed", zap.String("workspace", workspaceName))
 }
 
 // QueryBuilder creates a new query builder instance for constructing URL query parameters.
@@ -151,11 +136,11 @@ func (c *Client) SetWorkspace(workspaceName string) {
 //
 // Example:
 //
-//	params := client.QueryBuilder().
+//	params := transport.QueryBuilder().
 //	    AddString("name", "test").
 //	    AddInt("limit", 100).
 //	    AddBool("active", true).
 //	    Build()
-func (c *Client) QueryBuilder() interfaces.ServiceQueryBuilder {
+func (t *Transport) QueryBuilder() interfaces.ServiceQueryBuilder {
 	return NewQueryBuilder()
 }

@@ -18,14 +18,14 @@ type testResponse struct {
 	Message string `json:"message"`
 }
 
-func setupTestClient(t *testing.T, baseURL string) *Client {
+func setupTestClient(t *testing.T, baseURL string) *Transport {
 	logger := zaptest.NewLogger(t)
 	authConfig := &AuthConfig{
 		APIKey:     "test-api-key",
 		APIVersion: "v0",
 	}
 
-	client := &Client{
+	transport := &Transport{
 		client:        resty.New().SetBaseURL(baseURL),
 		logger:        logger,
 		authConfig:    authConfig,
@@ -34,7 +34,7 @@ func setupTestClient(t *testing.T, baseURL string) *Client {
 		userAgent:     "test-agent",
 	}
 
-	return client
+	return transport
 }
 
 func TestGet_Success(t *testing.T) {

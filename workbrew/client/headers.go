@@ -23,9 +23,9 @@ import "resty.dev/v3"
 //	// Final header: X-Custom: request (per-request value wins)
 //
 // Empty header values ("") are automatically filtered out to prevent sending empty headers.
-func (c *Client) applyHeaders(req *resty.Request, requestHeaders map[string]string) {
+func (t *Transport) applyHeaders(req *resty.Request, requestHeaders map[string]string) {
 	// Apply global headers first
-	for k, v := range c.globalHeaders {
+	for k, v := range t.globalHeaders {
 		if v != "" {
 			req.SetHeader(k, v)
 		}

@@ -16,7 +16,7 @@ func setupMockClient(t *testing.T) (*Service, string) {
 	logger := zap.NewNop()
 	baseURL := "https://console.workbrew.com/workspaces/test-workspace"
 
-	httpClient, err := client.NewClient("test-api-key", "test-workspace",
+	httpClient, err := client.NewTransport("test-api-key", "test-workspace",
 		client.WithLogger(logger),
 		client.WithBaseURL("https://console.workbrew.com"),
 	)

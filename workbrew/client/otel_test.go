@@ -24,15 +24,15 @@ func TestEnableTracing_DefaultConfig(t *testing.T) {
 	defer server.Close()
 
 	// Create client with base URL override
-	client, err := NewClient("test-api-key", "test-workspace", WithBaseURL(server.URL))
+	transport, err := NewTransport("test-api-key", "test-workspace", WithBaseURL(server.URL))
 	require.NoError(t, err)
 
 	// Enable tracing with default config
-	err = client.EnableTracing(nil)
+	err = transport.EnableTracing(nil)
 	require.NoError(t, err)
 
 	// Verify the transport was wrapped
-	httpClient := client.client.Client()
+	httpClient := transport.client.Client()
 	require.NotNil(t, httpClient)
 	require.NotNil(t, httpClient.Transport)
 }
@@ -54,7 +54,7 @@ func TestEnableTracing_CustomConfig(t *testing.T) {
 	defer server.Close()
 
 	// Create client with base URL override
-	client, err := NewClient("test-api-key", "test-workspace", WithBaseURL(server.URL))
+	transport, err := NewTransport("test-api-key", "test-workspace", WithBaseURL(server.URL))
 	require.NoError(t, err)
 
 	// Enable tracing with custom config
@@ -63,7 +63,7 @@ func TestEnableTracing_CustomConfig(t *testing.T) {
 		Propagators:    propagation.TraceContext{},
 		ServiceName:    "test-service",
 	}
-	err = client.EnableTracing(config)
+	err = transport.EnableTracing(config)
 	require.NoError(t, err)
 
 	// Make a request to trigger span creation
@@ -74,7 +74,7 @@ func TestEnableTracing_CustomConfig(t *testing.T) {
 		} `json:"data"`
 	}
 	var result TestResponse
-	_, err = client.Get(ctx, "/test", nil, nil, &result)
+	_, err = transport.Get(ctx, "/test", nil, nil, &result)
 	require.NoError(t, err)
 
 	// Verify span was created
@@ -133,7 +133,7 @@ func TestEnableTracing_WithCustomSpanNameFormatter(t *testing.T) {
 	defer server.Close()
 
 	// Create client with base URL override
-	client, err := NewClient("test-api-key", "test-workspace", WithBaseURL(server.URL))
+	transport, err := NewTransport("test-api-key", "test-workspace", WithBaseURL(server.URL))
 	require.NoError(t, err)
 
 	// Enable tracing with custom span name formatter
@@ -143,7 +143,7 @@ func TestEnableTracing_WithCustomSpanNameFormatter(t *testing.T) {
 			return "WB: " + req.Method + " " + req.URL.Path
 		},
 	}
-	err = client.EnableTracing(config)
+	err = transport.EnableTracing(config)
 	require.NoError(t, err)
 
 	// Make a request
@@ -154,7 +154,7 @@ func TestEnableTracing_WithCustomSpanNameFormatter(t *testing.T) {
 		} `json:"data"`
 	}
 	var result TestResponse
-	_, err = client.Get(ctx, "/test/path", nil, nil, &result)
+	_, err = transport.Get(ctx, "/test/path", nil, nil, &result)
 	require.NoError(t, err)
 
 	// Verify custom span name
@@ -175,7 +175,7 @@ func TestWithTracing_ClientOption(t *testing.T) {
 	otel.SetTracerProvider(tracerProvider)
 
 	// Create client with tracing enabled via option
-	client, err := NewClient(
+	transport, err := NewTransport(
 		"test-api-key",
 		"test-workspace",
 		WithTracing(nil), // Uses global tracer provider
@@ -183,7 +183,7 @@ func TestWithTracing_ClientOption(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verify tracing is enabled
-	httpClient := client.client.Client()
+	httpClient := transport.client.Client()
 	require.NotNil(t, httpClient)
 	require.NotNil(t, httpClient.Transport)
 }
@@ -215,7 +215,7 @@ func TestEnableTracing_ErrorPropagation(t *testing.T) {
 	defer server.Close()
 
 	// Create client with tracing
-	client, err := NewClient(
+	transport, err := NewTransport(
 		"test-api-key",
 		"test-workspace",
 		WithBaseURL(server.URL),
@@ -225,7 +225,7 @@ func TestEnableTracing_ErrorPropagation(t *testing.T) {
 	config := &OTelConfig{
 		TracerProvider: tracerProvider,
 	}
-	err = client.EnableTracing(config)
+	err = transport.EnableTracing(config)
 	require.NoError(t, err)
 
 	// Make a request that will result in an error
@@ -236,7 +236,7 @@ func TestEnableTracing_ErrorPropagation(t *testing.T) {
 		} `json:"data"`
 	}
 	var result TestResponse
-	_, err = client.Get(ctx, "/not-found", nil, nil, &result)
+	_, err = transport.Get(ctx, "/not-found", nil, nil, &result)
 
 	// The request should return an API error
 	require.Error(t, err)
