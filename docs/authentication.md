@@ -2,7 +2,7 @@
 
 ## What is API Key Authentication?
 
-The Workbrew SDK uses API key authentication to securely access the Workbrew API. Your API key is sent with every request to identify and authorize your application.
+The Workbrew SDK uses Bearer token authentication to securely access the Workbrew API. Your API key is sent as a Bearer token with every request to identify and authorize your application.
 
 ## Why Use Proper Authentication?
 
@@ -10,9 +10,9 @@ Proper authentication handling helps you:
 
 - **Secure your credentials** - Avoid hardcoding API keys in source code
 - **Prevent unauthorized access** - Ensure only valid API keys are used
-- **Enable key rotation** - Easily update keys without code changes
 - **Support multiple environments** - Use different keys for dev, staging, and production
 - **Audit usage** - Track which keys are making requests
+- **Simplify key rotation** - Create new clients with new keys when needed
 
 ## When to Use It
 
@@ -224,7 +224,7 @@ func getAPIKeyFromVault() (string, error) {
         return "", err
     }
 
-    apiKey := secret.Data["data"].(map[string]interface{})["api_key"].(string)
+    apiKey := secret.Data["data"].(map[string]any)["api_key"].(string)
     return apiKey, nil
 }
 ```
@@ -296,7 +296,7 @@ func (s *WorkbrewService) ListDevices(ctx context.Context, usePremium bool) {
 
 - Store API keys in environment variables
 - Use secret management services in production
-- Rotate API keys regularly
+- Rotate API keys regularly (recreate client with new key)
 - Use different keys for different environments
 - Revoke compromised keys immediately
 - Add `*.env` files to `.gitignore`
@@ -309,6 +309,21 @@ func (s *WorkbrewService) ListDevices(ctx context.Context, usePremium bool) {
 - Use production keys in development
 - Log API keys in application logs
 - Store API keys in client-side code
+
+### Key Rotation
+
+When you need to rotate an API key, create a new client:
+
+```go
+// Old client with compromised key
+oldClient, _ := client.NewClient(oldKey, workspace)
+
+// Create new client with rotated key
+newClient, _ := client.NewClient(newKey, workspace)
+
+// Switch to using newClient
+// The API key is immutable after client creation
+```
 
 ## Troubleshooting
 

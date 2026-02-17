@@ -31,15 +31,15 @@ func WithAPIVersion(version string) ClientOption {
 	}
 }
 
-// WithAPIKey allows changing the API key during client initialization (before auth setup)
-// For runtime API key updates after client creation, use client.UpdateAPIKey() instead
+// WithAPIKey allows setting the API key during client initialization.
+// The API key cannot be changed after the client is created.
 func WithAPIKey(apiKey string) ClientOption {
 	return func(c *Client) error {
 		if apiKey == "" {
 			return fmt.Errorf("API key cannot be empty")
 		}
 		c.authConfig.APIKey = apiKey
-		c.logger.Info("API key updated during initialization")
+		c.logger.Info("API key configured")
 		return nil
 	}
 }
