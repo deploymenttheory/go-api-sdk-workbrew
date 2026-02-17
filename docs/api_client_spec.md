@@ -15,6 +15,16 @@
   - Contrast with Nexthink: No OAuth2 flow, no separate auth endpoint
   - Contrast with VirusTotal: Uses `Authorization: Bearer` instead of `x-apikey` header
 
+### API Versioning
+- **Pattern**: Version specified via HTTP header
+- **Header**: `X-Workbrew-API-Version: {version}`
+- **Default Version**: `v0`
+- **Impact on Client**:
+  - API version set as global header during client initialization
+  - No version in URL path (unlike many REST APIs)
+  - Version header included in all requests
+  - Allows server-side version negotiation
+
 ### Workspace Scoping
 - **Pattern**: All API endpoints are workspace-scoped
 - **URL Structure**: `https://console.workbrew.com/workspaces/{workspace_name}/{resource}.{format}`
